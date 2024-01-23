@@ -1,0 +1,125 @@
+---
+title: "Zadanie 3. Łączenie z bazą danych przy pomocy skryptu R"
+author: "Gabriel Szewczyk"
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+## Importowanie bibliotek
+```{r, out.width}
+library(DBI)
+library(RPostgres)
+```
+
+## Połączenie z bazą danych
+```{r}
+dsn_database = "wbauer_adb_2023"   
+dsn_hostname = "pgsql-196447.vipserv.org"  
+dsn_port = "5432"                
+dsn_uid = "wbauer_adb"        
+dsn_pwd = "adb2020"  
+
+con <- dbConnect(Postgres(), dbname = dsn_database, host=dsn_hostname, port=dsn_port, user=dsn_uid, password=dsn_pwd)
+
+```
+
+# 1. Ile kategorii filmów mamy w wypożyczalni?
+
+```{r}
+var <- dbGetQuery(con, "SELECT * FROM category")
+nvar <- nrow(var)
+sprintf("W wypożyczalni mamy %d kategorii filmów.", nvar)
+```
+
+# 2. Wyświetl listę kategorii w kolejności alfabetycznej.
+
+```{r}
+var <- dbGetQuery(con, 'SELECT category_id, name FROM category ORDER BY name ASC')
+var
+```
+
+# 3. Znajdź najstarszy i najmłodszy film do wypożyczenia.
+
+```{r}
+films <- dbGetQuery(con, "SELECT title, release_year FROM film ORDER BY release_year ASC, title ASC")
+
+sprintf("Najstarszym filmem do wypożyczenia jest %s z roku %d", films[1,1], films[1,2])
+sprintf("Najnowszym filmem do wypożyczenia jest %s z roku %d.", films[length(films[,1]),1], films[length(films[,2]),2])
+
+```
+WNIOSEK: Wszystkie filmy w bazie pochodzą z roku 2006, więc poukładane zostały alfabetycznie.
+
+# 4. Ile wypożyczeń odbyło się między 2005-07-01 a 2005-08-01?
+
+```{r}
+rents <- dbGetQuery(con, "SELECT rental_id FROM rental WHERE rental_date BETWEEN '2005-07-01' AND '2005-08-01'")
+sprintf("W lipcu 2005 roku odbyło się %d wypożyczeń", length(rents[,1]))
+
+```
+
+# 5. Ile wypożyczeń odbyło się między 2010-01-01 a 2011-02-01?
+
+```{r}
+rents2 <- dbGetQuery(con, "SELECT rental_id FROM rental WHERE rental_date BETWEEN '2010-01-01' AND '2011-02-01'")
+sprintf("Między 2010-01-01 a 2011-02-01 odbyło się %d wypożyczeń", length(rents2[,1]))
+```
+WNIOSEK: nie było wypożyczeń / baza danych nie została zaktualizowana.
+
+# 6. Znajdź największą płatność wypożyczenia.
+
+```{r}
+payment <- dbGetQuery(con, "SELECT p.payment_date, c.first_name, c.last_name, p.amount FROM payment as p, customer as c WHERE p.customer_id = c.customer_id ORDER BY p.amount DESC")
+date <- substr(payment[1,1], 1, 10)
+sprintf("Dnia %s, %s %s wypożyczył(a) książkę na kwotę %s$ ", date, payment[1, 2], payment[1, 3], payment[1, 4])
+```
+
+# 7. Znajdź wszystkich klientów z Polski, Nigerii lub Bangladeszu.
+Wybieramy tutaj każdą zależność tabel która ma ze sobą powiązanie, by w klauzuli WHERE móc ją przyrównać. W ten sposób omijamy powtarzanie się tych samych rekordów
+```{r}
+clients <- dbGetQuery(con, "SELECT c.customer_id, c.first_name, c.last_name, ctr.country FROM customer as c, address as a, city as ct, country as ctr WHERE (country = 'Poland' or country = 'Nigeria' or country = 'Bangladesh') AND (ctr.country_id = ct.country_id AND ct.city_id = a.city_id AND a.address_id = c.address_id)")
+sprintf("Klientów z bangladeszu, polski i nigerii jest łącznie %d. Poniżej zaprezentowano ostatnie 10 pozycji:", nrow(clients))
+tail(clients[2:4])
+```
+
+# 8. Gdzie mieszkają członkowie personelu?
+
+```{r}
+staff_persons <- dbGetQuery(con, "SELECT s.first_name, s.last_name, a.address, ct.city, ctr.country FROM country as ctr, staff as s, city as ct, address as a WHERE (a.address_id = s.address_id AND ctr.country_id = ct.country_id AND ct.city_id = a.city_id)")
+staff_persons
+```
+
+# 9. Ilu pracowników mieszka w Argentynie lub Hiszpanii?
+
+```{r}
+staff_from_arg_esp <- dbGetQuery(con, "SELECT ctr.country, s.staff_id FROM country as ctr, staff as s, address as a, city as ct WHERE (ctr.country = 'Argentina' OR ctr.country = 'Spain') AND (a.address_id = s.address_id AND ctr.country_id = ct.country_id AND ct.city_id = a.city_id)")
+sprintf("W Argentynie i Hiszpanii mieszka %d pracowników.", nrow(staff_from_arg_esp))
+```
+
+# 10. Jakie kategorie filmów zostały wypożyczone przez klientów?
+
+```{r}
+rented_categories <- dbGetQuery(con, "SELECT DISTINCT cat.name FROM category as cat, film_category as fcat, film as f, inventory as i, rental as r WHERE (cat.category_id = fcat.category_id AND fcat.film_id = f.film_id AND f.film_id = i.film_id AND i.inventory_id = r.inventory_id)")
+rented_categories
+```
+
+# 11. Znajdź wszystkie kategorie filmów wypożyczonych w Ameryce.
+
+```{r}
+categories_usa <- dbGetQuery(con, "SELECT DISTINCT cat.name FROM country as ctr, city as ct, address as a, customer as c, rental as r, inventory as i, film as f, film_category as fcat, category as cat WHERE ctr.country = 'United States' AND (ctr.country_id = ct.country_id AND a.city_id = ct.city_id AND a.address_id = c.address_id AND c.customer_id = r.customer_id AND r.inventory_id = i.inventory_id AND i.film_id = f.film_id AND f.film_id = fcat.film_id AND fcat.category_id = cat.category_id)")
+categories_usa
+```
+
+# 12. Znajdź wszystkie tytuły filmów, w których grał: Olympia Pfeiffer lub Julia Zellweger lub Ellen Presley
+
+
+```{r}
+actors <- dbGetQuery(con, "SELECT a.first_name, a.last_name, f.title FROM actor as a, film_actor as fa, film as f WHERE ((a.first_name = 'Olympia' AND a.last_name = 'Pfeiffer') OR (a.first_name = 'Julia' AND a.last_name = 'Zellweger') OR (a.first_name = 'Ellen' AND a.last_name = 'Presley')) AND (a.actor_id = fa.actor_id AND fa.film_id = f.film_id)")
+sprintf("Łącznie filmów, w których grali Olympia Pfeiffer, Julia Zellweger lub Ellen Presley, było %d", nrow(actors))
+actors
+```

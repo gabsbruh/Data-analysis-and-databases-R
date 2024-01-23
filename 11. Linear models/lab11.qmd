@@ -1,0 +1,264 @@
+---
+title: "Zadanie 11. Regresja liniowa, regresja logistyczna"
+author: "Gabriel Szewczyk"
+date: 01.16.2024
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+    code-block-border-left: true
+editor: visual
+---
+
+```{r load, warning=FALSE}
+library(glmnet)
+library(readxl)
+library(readr)
+library(tidymodels)
+library(ggplot2)
+```
+
+## Zadanie 1.
+
+Na podstawie danych zawartych w pliku SCORES.csv wykonaj i oceń regresję liniową, gdzie Twoją daną niezależną (predyktorem) będą godziny poświęcone na przygotowanie, a wynikową uzyskane punkty. Wykonanie zadania powinno składać się z następujących kroków:
+
+1. Odczytaj dane z pliku SCORES.csv. Przeprowadź wstępną analizę danych.
+2. Wykonaj wstępny wykres uzyskanych danych (typu “scatter”)
+3. Dokonaj podziału danych na zbiory danych niezależnych (wejściowe, X) oraz zaleznych (wyjściowe, y) dla swojego modelu, a następnie podziel zbiór na dane testowe i treningowe (30%)
+4. Utwróz model regresji liniowej za pomocą lm
+5. Przenalizuj opis dopasowania modelu zwracany przez funkcję lm
+6. Wykorzystając stworozny model dokonaj predykcji dla części testowej X. Porównaj wynik (y_pred) z posiadanymi danymi (y_test).
+7. Wykonaj wykres konfrontujący dane testowe (X_test, y_test; typu “scatter”) oraz predykcje (X_test, y_pred; linia prosta)
+8. Dokonaj walidacji uzyskanych predykcji wykorzystując metryki: średni błąd bezwzględny (Mean Absolute Error), błąd średniokwadratowy (Mean Squared Error) oraz pierwiastek błędu średniokwadratowego (Root Mean Squared Error).
+
+  Następnie utworzony skrypt wykorzystaj na danych zawartych w SBP.csv, gdzie predyktorem będzie wiek, a wynikiem
+  ciśnienie (SBP). Czy uzyskane wyniki z modelu są równie zadowalające?
+
+```{r zadanie_1}
+scores <- read.csv("SCORES.csv")
+
+# wyswietlanie wykresu typu scatter
+ggplot(data=scores, aes(x=Hours, y=Scores)) +
+  geom_point()
+ length(scores)
+
+
+# podzial scores na zbior trenujacy i testowy (trenujacy posiada 70% danych)
+set.seed(777)
+indexes <- sample(nrow(scores), 0.7*nrow(scores))
+test_data <- scores[indexes,]
+glimpse(test_data)
+train_data <- scores[-indexes,]
+# trenowanie na bazie zbioru train_data
+lm_test_scores <- lm(Scores~Hours, data = test_data)
+summary(lm_test_scores)
+
+# wykonanie predykcji
+y_pred <- predict(lm_test_scores, newdata=test_data)
+predictions <- data.frame(Hours=test_data[,1], Scores=y_pred)
+
+# zestawienie danych na wykresie
+ggplot() +
+  geom_point(data=test_data, aes(x=Hours, y=Scores, color = 'real')) +
+  geom_line(data=predictions, aes(x=Hours, y=Scores, color = 'predicted')) +
+  scale_color_manual(values = c('real' = 'blue', 'predicted' = 'red'), labels=(c('predicted','real'))) +
+  labs(title= "Wynik regresji liniowej dla danych Scores")
+
+# walidacja danych
+MAE <- mean(abs(test_data[,2]-y_pred))
+MSE <- mean((test_data[,2]-y_pred)^2)
+RMSE <- sqrt(MSE)
+cat('Mean Absolute Error: ', MAE)
+cat('Mean Squared Error: ', MSE)
+cat('Root Mean Squared Error: ', RMSE)
+
+```
+
+**Przypadek dla danych z pliku SBP.csv**
+
+```{r, zadanie_1_sbp}
+scores <- read.csv("SBP.csv")
+
+# wyswietlanie wykresu typu scatter
+ggplot(data=scores, aes(x=Age, y=SBP)) +
+  geom_point()
+ length(scores)
+
+
+# podzial scores na zbior trenujacy i testowy (trenujacy posiada 70% danych)
+set.seed(322)
+indexes <- sample(nrow(scores), 0.7*nrow(scores))
+test_data <- scores[indexes,]
+glimpse(test_data)
+train_data <- scores[-indexes,]
+# trenowanie na bazie zbioru train_data
+lm_test_scores <- lm(SBP~Age, data = test_data)
+summary(lm_test_scores)
+
+# wykonanie predykcji
+y_pred <- predict(lm_test_scores, newdata=test_data)
+predictions <- data.frame(Age=test_data[,1], SBP=y_pred)
+
+# zestawienie danych na wykresie
+ggplot() +
+  geom_point(data=test_data, aes(x=Age, y=SBP, color = 'real')) +
+  geom_line(data=predictions, aes(x=Age, y=SBP, color = 'predicted')) +
+  scale_color_manual(values = c('real' = 'blue', 'predicted' = 'red'), labels=(c('predicted','real'))) +
+  labs(title= "Wynik regresji liniowej dla danych SBP")
+
+
+# walidacja danych
+MAE <- mean(abs(test_data[,2]-y_pred))
+MSE <- mean((test_data[,2]-y_pred)^2)
+RMSE <- sqrt(MSE)
+cat('Mean Absolute Error: ', MAE)
+cat('Mean Squared Error: ', MSE)
+cat('Root Mean Squared Error: ', RMSE)
+
+```
+
+
+## Zadanie 2.
+
+Na podstawie danych zawartych w pliku PETROL.csv wykonaj i oceń regresję liniową. Jako daną zależną wykorzystaj zużycie paliwa, a pozostałe - jako predyktory. Wykonanie zadania powinno składać się z kroków podobnych do tych z zadania poprzedniego.
+
+Czy uzyskane wyniki predykcji modelu są dobre? Co mogło mieć pozytywny/negatywny wpływ na taki wynik?
+
+```{r pytanie_2}
+petrol <- read.csv("PETROL.csv")
+
+# wyswietlanie wykresu typu scatter
+ggplot(data=petrol, aes(x=Zuzycie_paliwa, y=Sredni_przychod)) +
+  geom_point()
+ length(petrol)
+
+
+# podzial petrol na zbior trenujacy i testowy (trenujacy posiada 70% danych)
+set.seed(322)
+indexes <- sample(nrow(petrol), 0.7*nrow(petrol))
+test_data <- petrol[indexes,]
+glimpse(test_data)
+train_data <- petrol[-indexes,]
+# trenowanie na bazie zbioru train_data
+lm_test_petrol <- lm(Sredni_przychod~Zuzycie_paliwa + Podatek_paliwowy + Utwardzone_autostrady + Procent_ludnosci_z_prawem_jazdy, data = test_data)
+summary(lm_test_petrol)
+
+# wykonanie predykcji
+y_pred <- predict(lm_test_petrol, newdata=test_data)
+predictions <- data.frame(Zuzycie_paliwa=test_data[,5], Sredni_przychod=y_pred)
+
+# zestawienie danych na wykresie
+ggplot() +
+  geom_point(data=test_data, aes(x=Zuzycie_paliwa, y=Sredni_przychod, color = 'real')) +
+  geom_line(data=predictions, aes(x=Zuzycie_paliwa, y=Sredni_przychod, color = 'predicted')) +
+  scale_color_manual(values = c('real' = 'blue', 'predicted' = 'red'), labels=(c('predicted','real'))) +
+  labs(title= "Wynik regresji liniowej dla danych Petrol")
+
+
+# walidacja danych
+MAE <- mean(abs(test_data[,2]-y_pred))
+MSE <- mean((test_data[,2]-y_pred)^2)
+RMSE <- sqrt(MSE)
+cat('Mean Absolute Error: ', MAE)
+cat('Mean Squared Error: ', MSE)
+cat('Root Mean Squared Error: ', RMSE)
+```
+
+* Ze względu na większą ilość danych zależnych, wykres w zależności od jednej z nich zaczyna nie mieć sensu. Innymi słowy, może on mieć sens w poszukiwaniu regresji lecz we wielu wymiarach. Jednakże do takiego poszukiwania po większej liczbie zmiennych decyzyjnych służą zapewne inne modele
+
+### Zadanie 3.
+
+Na podstawie danych zawartych w pliku HEART.csv wykonaj i oceń regresję logistyczną, gdzie Twoją daną zależną jest kolumna “num”. Wykonanie zadania powinno składać się z następujących kroków:
+
+1. Zaimportowanie niezbędnych bibliotek w szczególności tych tworzących modele liniowe, a także biblioteki do operacji na danych oraz tworzenia wykresów.
+2. Odczytanie danych z pliku HEART.csv. Przeprowadź wstępną analizę danych.
+3. Przetworzenie danych, tj: oznaczenie braku danych (“?”) na NaN, usunięcię kolumn zawierających zbyt dużo brakujących danych (3 kolumny), usunięcie wierszy z brakującymi wartościami.
+4. Zakoduj niezależne zmienne kategorialne np: jako wartości “dummy”. Zmienne kategorialne to takie, które reprezentuja przynależność do kategorii. W przypadku naszych odfiltrowanych danych będą to kolumny: cp, restecg, fbs, sex, exang. Jako, że trzy ostatnie już zapisane są w formie 0 i 1 tylko cp i restecg wymagają tej operacji.
+5. Dokonaj podziału danych na zbiory danych niezależnych (wejściowe, X) oraz zależnych (wyjściowe, y) dla swojego modelu, a następnie podziel zbiór na dane testowe i treningowe (20%).
+6. Utwróz model regresji logistycznej.
+7. Oceń wynik za pomocą wybranych metryk.
+
+  Możesz również spróbować ustandaryzować dane (np: poprzez skalowanie) po podziale na zbiory treningowy i testowy.
+
+```{r pytanie_3}
+
+heart <- read.csv("HEART.csv")
+heart <- heart |>
+  select(-slope, -ca, -thal) |>
+  mutate_all(~ if_else(. == "?", NA, .)) |>
+  drop_na() |>
+  mutate(cp = case_when(
+    cp == 1 ~ "brak",
+    cp == 2 ~ "łagodny",
+    cp == 3 ~ "umiarkowany",
+    cp == 4 ~ "silny"
+  ), restecg = case_when(
+    restecg == 0 ~ "Brak badania",
+    restecg == 1 ~ "Wynik prawidłowy",
+    restecg == 2 ~ "Wynik nieprawidłowy"
+  ))
+
+heart$num = as.factor(heart$num)
+
+heart <- heart |>
+  select(cp, restecg, fbs, sex, exang, num)
+
+ggplot(heart, aes(cp, fill = num)) +
+  geom_bar() +
+  coord_flip()
+
+set.seed(421)
+split <- initial_split(heart, prop = 0.8, strata = num)
+train <- split |>
+         training()
+test <- split |>
+        testing()
+
+model <- logistic_reg(mixture = double(1), penalty = double(1)) |>
+  set_engine("glmnet") |>
+  set_mode("classification") |>
+  fit(num ~ ., data = train)
+
+# Model summary
+tidy_summary <- tidy(model)
+cat("Model Summary:\n")
+print(tidy_summary)
+
+pred_class <- predict(model,
+                      new_data = test,
+                      type = "class")
+
+# Class Probabilities
+pred_proba <- predict(model,
+                      new_data = test,
+                      type = "prob")
+
+results <- test |>
+  select(num) |>
+  bind_cols(pred_class, pred_proba)
+
+log_reg_final <- logistic_reg(penalty = 0.0000000001, mixture = 0) |>
+                 set_engine("glmnet") |>
+                 set_mode("classification") |>
+                 fit(num ~ ., data = train)
+
+# Evaluate the model performance on the testing set
+pred_class_final <- predict(log_reg_final,
+                            new_data = test,
+                            type = "class")
+
+results <- test |>
+  select(num) |>
+  bind_cols(pred_class, pred_proba)
+
+# Create confusion matrix
+conf_mat <- conf_mat(results, truth = num,
+                     estimate = .pred_class)
+
+cat("\nConfusion Matrix:\n")
+print(conf_mat)
+```

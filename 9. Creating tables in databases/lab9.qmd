@@ -1,0 +1,124 @@
+---
+title: "Zadanie 9. Tworzenie tabel w bazach danych"
+author: "Gabriel Szewczyk"
+date: 12.13.2023
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+
+# Tworzenie tabel
+
+## Załadowanie biblioteki
+
+```{r load, warning=FALSE}
+library(RMariaDB)
+```
+
+## Utworzenie pustej bazy
+
+```{r empty_DB, output=FALSE}
+dsn_database = "gabs"
+dsn_port = "3306"
+dsn_hostname = "mysql.agh.edu.pl"
+dsn_uid = "gabs"
+dsn_pwd =  "sQ4wXLZGch2gbNMb"
+con <- dbConnect(MariaDB() , dbname = dsn_database, host=dsn_hostname, port=dsn_port, user=dsn_uid, password=dsn_pwd)
+```
+
+## Utworzenie tabel 
+Tabela countries
+```{r countries, output=FALSE}
+create_countries <- "
+CREATE TABLE IF NOT EXISTS countries (
+  id INTEGER PRIMARY KEY,
+  country_code VARCHAR(10) CHECK(LENGTH(country_code) > 0),
+  name VARCHAR(150) CHECK(LENGTH(name) > 0)
+);"
+
+dbExecute(con, create_countries)
+```
+
+Tabela cities
+```{r cities, output=FALSE}
+create_cities <- "
+CREATE TABLE IF NOT EXISTS cities (
+  id INTEGER PRIMARY KEY,
+  name VARCHAR(150) CHECK(LENGTH(name) > 0),
+  country_id integer NOT NULL,
+  FOREIGN KEY (country_id) REFERENCES countries(id)
+);"
+dbExecute(con, create_cities)
+```
+
+Tabela users
+```{r users, output=FALSE}
+create_users <- "
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY,
+  email VARCHAR(150) CHECK(LENGTH(email) > 0)
+);"
+dbExecute(con, create_users)
+```
+
+Tabela hosts
+```{r hosts, output=FALSE}
+create_hosts <- "
+CREATE TABLE IF NOT EXISTS hosts (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);"
+dbExecute(con, create_hosts)
+```
+
+Tabela places
+```{r places, output=FALSE}
+create_places <- "
+CREATE TABLE IF NOT EXISTS places (
+  id INTEGER PRIMARY KEY,
+  host_id INTEGER NOT NULL,
+  city_id INTEGER NOT NULL, 
+  address VARCHAR(150) CHECK(LENGTH(address) > 0),
+  FOREIGN KEY (city_id) REFERENCES cities(id),
+  FOREIGN KEY (host_id) REFERENCES hosts(id)
+);"
+dbExecute(con, create_places)
+```
+
+Tabela bookings
+```{r bookings, output=FALSE}
+create_bookings <- "
+CREATE TABLE IF NOT EXISTS bookings (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  place_id INTEGER NOT NULL, 
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  price_per_night FLOAT NOT NULL,
+  num_nights INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (place_id) REFERENCES places(id)
+);"
+dbExecute(con, create_bookings)
+```
+
+Tabela reviews
+```{r reviews, output=FALSE}
+create_reviews <- "
+CREATE TABLE IF NOT EXISTS reviews (
+  id INTEGER PRIMARY KEY,
+  booking_id INTEGER NOT NULL,
+  rating TINYINT NOT NULL,
+  review_body TEXT CHECK(LENGTH(review_body) > 0),
+  FOREIGN KEY (booking_id) REFERENCES bookings(id)
+);"
+dbExecute(con, create_reviews)
+```

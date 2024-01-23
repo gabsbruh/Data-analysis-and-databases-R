@@ -1,0 +1,11 @@
+---
+title: "Zadanie Domowe. Funkcja gęstości prawdopodobieństwa rozkładu Gaussa"
+author: "Gabriel Szewczyk"
+format: 
+  pdf:
+    fontsize: 18pt
+editor: visual
+---
+$$
+f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$

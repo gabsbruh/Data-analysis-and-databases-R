@@ -1,0 +1,3026 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Szewczyk">
+<meta name="dcterms.date" content="2023-11-29">
+
+<title>Zadanie 7.. Wprowadzenie do tidyverse cz. 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab7_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab7_files/libs/quarto-html/quarto.js"></script>
+<script src="lab7_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab7_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab7_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab7_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab7_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab7_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab7_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab7_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full">
+
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Zadanie 7.. Wprowadzenie do tidyverse cz. 2</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Gabriel Szewczyk </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 29, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- > to strzalka -->
+<!-- x %>% sin() %>% cos() - wrapowanie funkcji-->
+<section id="załadowanie-paczek" class="level2">
+<h2 class="anchored" data-anchor-id="załadowanie-paczek">Załadowanie paczek</h2>
+<p>przez fakt identycznych nazw funkcji sortowania data.frame’ów w paczce za pomocą biblioteki ‘conflicted’ wybrałem paczki które należy traktować jako pierwsze domyślne.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ purrr     1.0.2
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(nycflights13)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="utworzenie-zbiorów-danych" class="level2">
+<h2 class="anchored" data-anchor-id="utworzenie-zbiorów-danych">Utworzenie zbiorów danych</h2>
+<ul>
+<li><em>zbiór danych sales_data ze sprzedażą wg produktów i kwartałów</em></li>
+<li><em>zbiór danych sales_data poszerzony o 6 dodatkowych kategorii</em></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Utwórz przykładowe dane</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co"># pierwszy dataset</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="fu">set.seed</span>(<span class="dv">15</span><span class="sc">*</span><span class="dv">101</span>) <span class="co"># zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>produkty <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Produkt_A"</span>, <span class="st">"Produkt_B"</span>, <span class="st">"Produkt_C"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>kwartały <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Q1"</span>, <span class="st">"Q2"</span>, <span class="st">"Q3"</span>, <span class="st">"Q4"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a>sales_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="at">Produkt =</span> <span class="fu">rep</span>(produkty, <span class="at">each =</span> <span class="fu">length</span>(kwartały)),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="at">Q1 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="at">Q2 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="at">Q3 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb4-13"><a href="#cb4-13"></a>  <span class="at">Q4 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>)</span>
+<span id="cb4-14"><a href="#cb4-14"></a>)</span>
+<span id="cb4-15"><a href="#cb4-15"></a></span>
+<span id="cb4-16"><a href="#cb4-16"></a></span>
+<span id="cb4-17"><a href="#cb4-17"></a></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co"># drugi dataset</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="fu">set.seed</span>(<span class="dv">15</span><span class="sc">*</span><span class="dv">101</span>) <span class="co"># zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>produkty <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Produkt_A"</span>, <span class="st">"Produkt_B"</span>, <span class="st">"Produkt_C"</span>)</span>
+<span id="cb4-21"><a href="#cb4-21"></a>sklepy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Sklep_X"</span>, <span class="st">"Sklep_Y"</span>, <span class="st">"Sklep_Z"</span>)</span>
+<span id="cb4-22"><a href="#cb4-22"></a>miesiace <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Styczeń"</span>, <span class="st">"Luty"</span>, <span class="st">"Marzec"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a>sales_data_advanced <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-25"><a href="#cb4-25"></a>  <span class="at">Produkt =</span> <span class="fu">rep</span>(produkty, <span class="at">each =</span> <span class="fu">length</span>(sklepy) <span class="sc">*</span> <span class="fu">length</span>(miesiace)),</span>
+<span id="cb4-26"><a href="#cb4-26"></a>  <span class="at">Sklep =</span> <span class="fu">rep</span>(sklepy, <span class="at">times =</span> <span class="fu">length</span>(produkty) <span class="sc">*</span> <span class="fu">length</span>(miesiace)),</span>
+<span id="cb4-27"><a href="#cb4-27"></a>  <span class="at">Miesiac =</span> <span class="fu">rep</span>(miesiace, <span class="at">each =</span> <span class="fu">length</span>(produkty) <span class="sc">*</span> <span class="fu">length</span>(sklepy)),</span>
+<span id="cb4-28"><a href="#cb4-28"></a>  <span class="at">Sprzedaz =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">27</span>),</span>
+<span id="cb4-29"><a href="#cb4-29"></a>  <span class="at">Koszty =</span> <span class="fu">sample</span>(<span class="dv">30</span><span class="sc">:</span><span class="dv">200</span>, <span class="dv">27</span>),</span>
+<span id="cb4-30"><a href="#cb4-30"></a>  <span class="at">Zysk =</span> <span class="cn">NA</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a>)</span>
+<span id="cb4-32"><a href="#cb4-32"></a>sales_data_advanced<span class="sc">$</span>Zysk <span class="ot">&lt;-</span> sales_data_advanced<span class="sc">$</span>Sprzedaz <span class="sc">-</span> sales_data_advanced<span class="sc">$</span>Koszty</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="analiza-zbioru-danych-sales_data" class="level2">
+<h2 class="anchored" data-anchor-id="analiza-zbioru-danych-sales_data">Analiza zbioru danych sales_data</h2>
+<p><strong>Wyświetlenie orginalnego dataframe’u</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>sales_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">Q2</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">Q4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">407</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: right;">167</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">436</td>
+<td style="text-align: right;">481</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">259</td>
+<td style="text-align: right;">262</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">393</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">373</td>
+<td style="text-align: right;">245</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">498</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: right;">360</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">203</td>
+<td style="text-align: right;">287</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">275</td>
+<td style="text-align: right;">364</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol type="1">
+<li><strong>Zmieniam format za pomocą funkcji pivot_longer()</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>sales_data_2 <span class="ot">&lt;-</span> sales_data  <span class="sc">|&gt;</span> <span class="fu">pivot_longer</span>(<span class="at">col =</span> <span class="sc">!</span>Produkt, <span class="at">names_to=</span><span class="st">"Kwartal"</span>, <span class="at">values_to=</span><span class="st">"Sprzedaz"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li><strong>Stwórz tabelę podsumowującą, która pokaże całkowitą sprzedaż dla każdego produktu we wszystkich kwartałach. Możesz użyć funkcji group_by() i summarize() z pakietu dplyr.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>sales_data_3 <span class="ot">&lt;-</span> sales_data_2 <span class="sc">|&gt;</span> <span class="fu">group_by</span>(Produkt, Kwartal) <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">calkowita_sprzedaz =</span> <span class="fu">sum</span>(Sprzedaz), <span class="at">.groups=</span>(<span class="st">'drop'</span>))</span>
+<span id="cb7-2"><a href="#cb7-2"></a>sales_data_3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Kwartal</th>
+<th style="text-align: right;">calkowita_sprzedaz</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Q1</td>
+<td style="text-align: right;">803</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Q2</td>
+<td style="text-align: right;">1232</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Q3</td>
+<td style="text-align: right;">1189</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Q4</td>
+<td style="text-align: right;">1073</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Q1</td>
+<td style="text-align: right;">1350</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Q2</td>
+<td style="text-align: right;">1122</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Q3</td>
+<td style="text-align: right;">1169</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Q4</td>
+<td style="text-align: right;">1381</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Q1</td>
+<td style="text-align: right;">1377</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Q2</td>
+<td style="text-align: right;">1191</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Q3</td>
+<td style="text-align: right;">1171</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Q4</td>
+<td style="text-align: right;">1509</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li><strong>Teraz użyj funkcji pivot_wider() do przywrócenia danych w formacie szerokim.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>sales_data_back <span class="ot">&lt;-</span> sales_data_3 <span class="sc">|&gt;</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Kwartal, <span class="at">values_from =</span> calkowita_sprzedaz)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>sales_data_back</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">Q2</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">Q4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: right;">803</td>
+<td style="text-align: right;">1232</td>
+<td style="text-align: right;">1189</td>
+<td style="text-align: right;">1073</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: right;">1350</td>
+<td style="text-align: right;">1122</td>
+<td style="text-align: right;">1169</td>
+<td style="text-align: right;">1381</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: right;">1377</td>
+<td style="text-align: right;">1191</td>
+<td style="text-align: right;">1171</td>
+<td style="text-align: right;">1509</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="analiza-zbioru-danych-sales_data_advanced" class="level2">
+<h2 class="anchored" data-anchor-id="analiza-zbioru-danych-sales_data_advanced">Analiza zbioru danych sales_data_advanced</h2>
+<ol type="1">
+<li><strong>Filtrowanie danych: Wybierz tylko te rekordy, gdzie zysk jest dodatni.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>positive_profit <span class="ot">&lt;-</span> sales_data_advanced <span class="sc">|&gt;</span> <span class="fu">filter</span>(Zysk<span class="sc">&gt;</span><span class="dv">0</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>positive_profit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li><strong>Sortowanie danych: Posortuj dane według malejącego zysku, a następnie według nazw produktów rosnąco.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>sorted <span class="ot">&lt;-</span> sales_data_advanced <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(Zysk), Produkt)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>sorted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">-14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li><strong>Tworzenie nowych kolumn: Dodaj kolumnę Marza_Procentowa, która będzie zawierała procentową marżę zysku dla każdego rekordu.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>margin <span class="ot">&lt;-</span> sorted <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Marza_Procentowa =</span> (Zysk<span class="sc">/</span>(Sprzedaz<span class="sc">+</span>Koszty))<span class="sc">*</span><span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Marza_Procentowa =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(Marza_Procentowa, <span class="dv">2</span>), <span class="st">"%"</span>))</span>
+<span id="cb11-2"><a href="#cb11-2"></a>margin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+<th style="text-align: left;">Marza_Procentowa</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+<td style="text-align: left;">84.36%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: left;">62.42%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+<td style="text-align: left;">66.43%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+<td style="text-align: left;">74.46%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: left;">75.78%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+<td style="text-align: left;">74.27%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: left;">50.79%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+<td style="text-align: left;">61.81%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">42.77%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: left;">63.1%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: left;">50.19%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+<td style="text-align: left;">47.84%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+<td style="text-align: left;">79.26%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: left;">40.25%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+<td style="text-align: left;">64.19%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+<td style="text-align: left;">27.58%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: left;">61.8%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: left;">26.67%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: left;">33.04%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: left;">25.17%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+<td style="text-align: left;">43.03%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: left;">33%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">18.71%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: left;">9.13%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: left;">-4.17%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: left;">-4.12%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+<td style="text-align: left;">-25.24%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li><strong>Agregacja danych: Stwórz tabelę, która pokaże średnią sprzedaż, koszty i zysk dla każdego sklepu.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>new_tab <span class="ot">&lt;-</span> margin <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>           <span class="fu">group_by</span>(Sklep) <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3"></a>           <span class="fu">summarise</span>(<span class="at">avg_sprzedaz =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Sprzedaz),<span class="dv">0</span>),<span class="at">avg_koszty =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Koszty),<span class="dv">0</span>), <span class="at">avg_zysk =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Zysk),<span class="dv">0</span>))</span>
+<span id="cb12-4"><a href="#cb12-4"></a>new_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: right;">avg_sprzedaz</th>
+<th style="text-align: right;">avg_koszty</th>
+<th style="text-align: right;">avg_zysk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: right;">275</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">176</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: right;">367</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">233</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">150</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li><strong>Pivotowanie danych: Przekształć dane w taki sposób, aby w jednym wierszu były informacje o sprzedaży, kosztach i zysku dla danego produktu w danym sklepie w danym miesiącu.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>sorted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">-14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><em>Mam problem ze zrozumieniem polecenia zadania - patrząc na jego opis, nie widzę różnicy względem pierwotnego zbioru danych, ponieważ w każdym wierszu znajdują się takie same dane jakie wymaga od nas to zadanie.</em></p>
+<ol start="6" type="1">
+<li><strong>Dodatkowe przekształcenie danych: Dodaj nową kolumnę Koszty_na_Sprzedaz reprezentującą procentowy udział kosztów w sprzedaży.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>koszty <span class="ot">&lt;-</span> sorted <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Koszty_na_Sprzedaz =</span> <span class="fu">round</span>((Koszty<span class="sc">/</span>Sprzedaz)<span class="sc">*</span><span class="dv">100</span>, <span class="dv">2</span>))</span>
+<span id="cb14-2"><a href="#cb14-2"></a>koszty</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+<th style="text-align: right;">Koszty_na_Sprzedaz</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+<td style="text-align: right;">8.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: right;">23.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+<td style="text-align: right;">20.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+<td style="text-align: right;">14.64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: right;">13.78</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+<td style="text-align: right;">14.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">32.63</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+<td style="text-align: right;">23.60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: right;">40.08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">22.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">33.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+<td style="text-align: right;">35.28</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+<td style="text-align: right;">11.57</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">42.60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+<td style="text-align: right;">21.81</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+<td style="text-align: right;">56.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">23.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">57.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">50.34</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">59.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">39.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">50.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">68.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">83.26</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: right;">108.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: right;">108.59</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+<td style="text-align: right;">167.52</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="7" type="1">
+<li><strong>Powrót do szerokiego formatu: Przekształć dane tak, aby wrócić do pierwotnego formatu, gdzie każdy wiersz reprezentuje produkt w danym sklepie w danym miesiącu.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>koszty</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+<th style="text-align: right;">Koszty_na_Sprzedaz</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">448</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">410</td>
+<td style="text-align: right;">8.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">497</td>
+<td style="text-align: right;">115</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: right;">23.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">380</td>
+<td style="text-align: right;">20.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">403</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">344</td>
+<td style="text-align: right;">14.64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">392</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: right;">13.78</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">386</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">329</td>
+<td style="text-align: right;">14.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">155</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">32.63</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">411</td>
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">314</td>
+<td style="text-align: right;">23.60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">479</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: right;">40.08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">358</td>
+<td style="text-align: right;">81</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">22.63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">401</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">33.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">394</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">255</td>
+<td style="text-align: right;">35.28</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">237</td>
+<td style="text-align: right;">11.57</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">277</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">42.60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">188</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">147</td>
+<td style="text-align: right;">21.81</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">131</td>
+<td style="text-align: right;">56.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">23.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">57.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">50.34</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">179</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">59.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">118</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">39.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">50.38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">165</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">68.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">83.26</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: right;">108.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">177</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: right;">108.59</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+<td style="text-align: right;">167.52</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><em>Nie wykonałem polecenia 6. którego nie zrozumiałem, więc domniemuję że nie zmieniam nic.</em></p>
+<ol start="8" type="1">
+<li><strong>Zaawansowane wybieranie danych: Wybierz rekordy z największymi kosztami na sprzedaż dla każdego produktu.</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>max_by_prod <span class="ot">&lt;-</span> koszty <span class="sc">|&gt;</span> <span class="fu">group_by</span>(Produkt) <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(Koszty_na_Sprzedaz)</span>
+<span id="cb16-2"><a href="#cb16-2"></a>max_by_prod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Produkt</th>
+<th style="text-align: left;">Sklep</th>
+<th style="text-align: left;">Miesiac</th>
+<th style="text-align: right;">Sprzedaz</th>
+<th style="text-align: right;">Koszty</th>
+<th style="text-align: right;">Zysk</th>
+<th style="text-align: right;">Koszty_na_Sprzedaz</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Produkt_A</td>
+<td style="text-align: left;">Sklep_Y</td>
+<td style="text-align: left;">Styczeń</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">83.26</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Produkt_B</td>
+<td style="text-align: left;">Sklep_X</td>
+<td style="text-align: left;">Luty</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">175</td>
+<td style="text-align: right;">-14</td>
+<td style="text-align: right;">108.70</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Produkt_C</td>
+<td style="text-align: left;">Sklep_Z</td>
+<td style="text-align: left;">Marzec</td>
+<td style="text-align: right;">117</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">-79</td>
+<td style="text-align: right;">167.52</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="analiza-zbioru-danych-flights" class="level2">
+<h2 class="anchored" data-anchor-id="analiza-zbioru-danych-flights">Analiza zbioru danych flights</h2>
+<ol type="1">
+<li>Określ, który przewoźnik ma największe opóźnienia przylotu?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>fl <span class="ot">&lt;-</span> flights</span>
+<span id="cb17-2"><a href="#cb17-2"></a>carrier_delays <span class="ot">&lt;-</span> fl <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(arr_delay)) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(carrier) <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">avg_arr_delay =</span> <span class="fu">round</span>(<span class="fu">mean</span>(arr_delay), <span class="dv">2</span>), <span class="at">.groups=</span><span class="st">'drop'</span>) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(avg_arr_delay))</span>
+<span id="cb17-3"><a href="#cb17-3"></a>carrier_delays</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">carrier</th>
+<th style="text-align: right;">avg_arr_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">F9</td>
+<td style="text-align: right;">21.92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FL</td>
+<td style="text-align: right;">20.12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">EV</td>
+<td style="text-align: right;">15.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">YV</td>
+<td style="text-align: right;">15.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OO</td>
+<td style="text-align: right;">11.93</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MQ</td>
+<td style="text-align: right;">10.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WN</td>
+<td style="text-align: right;">9.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B6</td>
+<td style="text-align: right;">9.46</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9E</td>
+<td style="text-align: right;">7.38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">UA</td>
+<td style="text-align: right;">3.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">US</td>
+<td style="text-align: right;">2.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">VX</td>
+<td style="text-align: right;">1.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DL</td>
+<td style="text-align: right;">1.64</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AA</td>
+<td style="text-align: right;">0.36</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HA</td>
+<td style="text-align: right;">-6.92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AS</td>
+<td style="text-align: right;">-9.93</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">cat</span>(<span class="st">"F9 ma największe opóźnienia ze średnią 21.92 minuty na jeden lot."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>F9 ma największe opóźnienia ze średnią 21.92 minuty na jeden lot.</code></pre>
+</div>
+</div>
+<p><em>Podglądając przebieg zmiennych nie wygląda na to aby opóźnienia miały związek także z lotniskiem docelowym, dane te są zbyt mało skoorelowane by można było to dostrzec gołym okiem.</em></p>
+<p><em>Musiałem dodatkowo usunąć rekordy zwierające nieokreśloną ilość opóźnienia, ponieważ funkcja mean nie działała przy nich poprawnie.</em></p>
+<ol start="2" type="1">
+<li>Znajdź loty, które są najbardziej opóźnione przy odlocie z każdego lotniska.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>airport_delay <span class="ot">&lt;-</span> fl <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(arr_delay)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3"></a>  <span class="fu">group_by</span>(origin, flight) <span class="sc">|&gt;</span> </span>
+<span id="cb20-4"><a href="#cb20-4"></a>  <span class="fu">summarise</span>(<span class="at">origin =</span> origin, <span class="at">destination =</span> dest, <span class="at">flight =</span>   flight, <span class="at">avg_dep_delay =</span> <span class="fu">mean</span>(dep_delay), <span class="at">.groups=</span><span class="st">'drop'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb20-5"><a href="#cb20-5"></a>  <span class="fu">group_by</span>(origin) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6"></a>  <span class="fu">slice_max</span>(avg_dep_delay,<span class="at">n=</span><span class="dv">1</span>)</span>
+<span id="cb20-7"><a href="#cb20-7"></a></span>
+<span id="cb20-8"><a href="#cb20-8"></a><span class="co"># przed kazda operacja podaje group by wzgledem czego chce grupowac</span></span>
+<span id="cb20-9"><a href="#cb20-9"></a>airport_delay</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">origin</th>
+<th style="text-align: right;">flight</th>
+<th style="text-align: left;">destination</th>
+<th style="text-align: right;">avg_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">EWR</td>
+<td style="text-align: right;">1510</td>
+<td style="text-align: left;">IAH</td>
+<td style="text-align: right;">278</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JFK</td>
+<td style="text-align: right;">3760</td>
+<td style="text-align: left;">RIC</td>
+<td style="text-align: right;">217</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LGA</td>
+<td style="text-align: right;">488</td>
+<td style="text-align: left;">DEN</td>
+<td style="text-align: right;">379</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><em>założyłem, że kolumna flight odpowiada za numer lotu przez co mogłem pogrupować loty.</em></p>
+</section>
+<section id="analiza-zbioru-danych-z-listy-billboardu." class="level2">
+<h2 class="anchored" data-anchor-id="analiza-zbioru-danych-z-listy-billboardu.">Analiza zbioru danych z listy Billboardu.</h2>
+<ol type="1">
+<li><strong>Wczytaj zbiór danych za pomocą funkcji read_csv()</strong></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>billboard <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"billboard.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 317 Columns: 83
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (3): artist.inverted, track, genre
+dbl  (66): year, x1st.week, x2nd.week, x3rd.week, x4th.week, x5th.week, x6th...
+lgl  (11): x66th.week, x67th.week, x68th.week, x69th.week, x70th.week, x71st...
+date  (2): date.entered, date.peaked
+time  (1): time
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li><strong>Sporządź tabelę zawierającą wszystkie piosenki, które spadły z listy we wrześniu 2000.</strong></li>
+</ol>
+<p><em>Nie będzie to takie proste, ponieważ mam jedynie podaną datę wejścia oraz serię tygodni, jakie miejsce zajmował utwór. ‘NA’ oznacza że utworu już nie ma, więc muszę znaleźć po ilu dniach utwory opuściły playlistę, następnie dodać do daty wejścia na billboard i sprawdzić czy data zawiera się we wrześniu.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>fallen <span class="ot">&lt;-</span> billboard <span class="sc">|&gt;</span> </span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="fu">select</span>(track, date.entered)<span class="sc">|&gt;</span> </span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="fu">mutate</span>(<span class="at">days_on_list =</span> <span class="dv">7</span> <span class="sc">*</span> <span class="fu">apply</span>(billboard[,<span class="dv">8</span><span class="sc">:</span><span class="fu">length</span>(billboard[<span class="dv">1</span>,])], <span class="at">MARGIN=</span><span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x)))) <span class="sc">|&gt;</span> </span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="fu">mutate</span>(<span class="at">date_dropped =</span> date.entered <span class="sc">+</span> days_on_list) <span class="sc">|&gt;</span> </span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="fu">filter</span>(date_dropped <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(<span class="st">"2000-09-01"</span>) <span class="sc">&amp;</span> date_dropped <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2000-09-30"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a><span class="fu">arrange</span>(date_dropped)</span>
+<span id="cb23-7"><a href="#cb23-7"></a></span>
+<span id="cb23-8"><a href="#cb23-8"></a></span>
+<span id="cb23-9"><a href="#cb23-9"></a>fallen</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 61%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">track</th>
+<th style="text-align: left;">date.entered</th>
+<th style="text-align: right;">days_on_list</th>
+<th style="text-align: left;">date_dropped</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">The Chain Of Love</td>
+<td style="text-align: left;">2000-04-15</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I Think God Can Explain</td>
+<td style="text-align: left;">2000-06-10</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: left;">2000-09-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cold Day In July</td>
+<td style="text-align: left;">2000-06-24</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: left;">2000-09-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">West Side Story</td>
+<td style="text-align: left;">2000-08-05</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: left;">2000-09-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Oops!.. I Did It Again</td>
+<td style="text-align: left;">2000-04-22</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Big Pimpin’</td>
+<td style="text-align: left;">2000-04-22</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Broadway</td>
+<td style="text-align: left;">2000-04-22</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Where I Wanna Be</td>
+<td style="text-align: left;">2000-04-22</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">The One</td>
+<td style="text-align: left;">2000-05-27</td>
+<td style="text-align: right;">105</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">As We Lay</td>
+<td style="text-align: left;">2000-07-15</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: left;">2000-09-09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I Turn To You</td>
+<td style="text-align: left;">2000-04-15</td>
+<td style="text-align: right;">154</td>
+<td style="text-align: left;">2000-09-16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Real Slim Shady</td>
+<td style="text-align: left;">2000-05-06</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: left;">2000-09-16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Separated</td>
+<td style="text-align: left;">2000-04-29</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Flowers On The Wall</td>
+<td style="text-align: left;">2000-04-29</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kernkraft 400</td>
+<td style="text-align: left;">2000-09-02</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">2000-09-16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Prayin’ For Daylight</td>
+<td style="text-align: left;">2000-05-06</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No Matter What They Say</td>
+<td style="text-align: left;">2000-07-15</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: left;">2000-09-23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">The Hardest Part Of Breaking Up (Is Getting Back Your Stuff)</td>
+<td style="text-align: left;">2000-09-02</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: left;">2000-09-23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Baby U Are</td>
+<td style="text-align: left;">2000-08-19</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: left;">2000-09-23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dance Tonight</td>
+<td style="text-align: left;">2000-05-20</td>
+<td style="text-align: right;">133</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Simple Kind Of Life</td>
+<td style="text-align: left;">2000-07-01</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I’ll Be</td>
+<td style="text-align: left;">2000-05-13</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">When You Need My Love</td>
+<td style="text-align: left;">2000-06-17</td>
+<td style="text-align: right;">105</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I Disappear</td>
+<td style="text-align: left;">2000-05-13</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ta Da</td>
+<td style="text-align: left;">2000-08-12</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">2000-09-30</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li><strong>Określ, która z piosenek danego gatunku była na liście najdłużej.</strong></li>
+</ol>
+<p><em>Obliczam długość dni liście billboardu, grupuje wzgledem gatunku, i wykonuje filtracje po dlugosci. W przypadku gdy rekordowe utwory byly po tyle samo dni zostawiam wszystkie</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>longest_on_billboard <span class="ot">&lt;-</span> billboard <span class="sc">|&gt;</span> <span class="fu">select</span>(track, genre, date.entered) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">days_on_list =</span> <span class="dv">7</span> <span class="sc">*</span> <span class="fu">apply</span>(billboard[,<span class="dv">8</span><span class="sc">:</span><span class="fu">length</span>(billboard[<span class="dv">1</span>,])], <span class="at">MARGIN=</span><span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x)))) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(genre) <span class="sc">|&gt;</span> <span class="fu">filter</span>(days_on_list <span class="sc">==</span> <span class="fu">max</span>(days_on_list, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(genre)</span>
+<span id="cb24-2"><a href="#cb24-2"></a></span>
+<span id="cb24-3"><a href="#cb24-3"></a></span>
+<span id="cb24-4"><a href="#cb24-4"></a>longest_on_billboard</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 16%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">track</th>
+<th style="text-align: left;">genre</th>
+<th style="text-align: left;">date.entered</th>
+<th style="text-align: right;">days_on_list</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Amazed</td>
+<td style="text-align: left;">Country</td>
+<td style="text-align: left;">1999-06-05</td>
+<td style="text-align: right;">385</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blue (Da Ba Dee)</td>
+<td style="text-align: left;">Electronica</td>
+<td style="text-align: left;">1999-12-11</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Better Off Alone</td>
+<td style="text-align: left;">Electronica</td>
+<td style="text-align: left;">2000-04-08</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Don’t Call Me Baby</td>
+<td style="text-align: left;">Electronica</td>
+<td style="text-align: left;">2000-07-08</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Open My Heart</td>
+<td style="text-align: left;">Gospel</td>
+<td style="text-align: left;">2000-08-26</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Auld Lang Syne (The Millenium Mix)</td>
+<td style="text-align: left;">Jazz</td>
+<td style="text-align: left;">1999-12-25</td>
+<td style="text-align: right;">35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">You Sang To Me</td>
+<td style="text-align: left;">Latin</td>
+<td style="text-align: left;">2000-02-26</td>
+<td style="text-align: right;">224</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bring It All To Me</td>
+<td style="text-align: left;">Pop</td>
+<td style="text-align: left;">1999-10-23</td>
+<td style="text-align: right;">203</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Liar</td>
+<td style="text-align: left;">R&amp;B</td>
+<td style="text-align: left;">2000-09-16</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Who Let The Dogs Out</td>
+<td style="text-align: left;">R&amp;B</td>
+<td style="text-align: left;">2000-07-22</td>
+<td style="text-align: right;">140</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Breathe</td>
+<td style="text-align: left;">Rap</td>
+<td style="text-align: left;">1999-11-06</td>
+<td style="text-align: right;">371</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Girls Dem Sugar</td>
+<td style="text-align: left;">Reggae</td>
+<td style="text-align: left;">2000-10-21</td>
+<td style="text-align: right;">105</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Higher</td>
+<td style="text-align: left;">Rock</td>
+<td style="text-align: left;">1999-09-11</td>
+<td style="text-align: right;">399</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- -->
+
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb25" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1"></a><span class="co">---</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a><span class="an">title:</span><span class="co"> "Zadanie 7.. Wprowadzenie do tidyverse cz. 2"</span></span>
+<span id="cb25-3"><a href="#cb25-3"></a><span class="an">author:</span><span class="co"> "Gabriel Szewczyk"</span></span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="an">date:</span><span class="co"> 11.29.2023</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb25-6"><a href="#cb25-6"></a><span class="co">  html:</span></span>
+<span id="cb25-7"><a href="#cb25-7"></a><span class="co">    page-layout: full</span></span>
+<span id="cb25-8"><a href="#cb25-8"></a><span class="co">    code-fold: false</span></span>
+<span id="cb25-9"><a href="#cb25-9"></a><span class="co">    code-tools: true</span></span>
+<span id="cb25-10"><a href="#cb25-10"></a><span class="co">    code-line-numbers: true</span></span>
+<span id="cb25-11"><a href="#cb25-11"></a><span class="co">    fontsize: 18pt</span></span>
+<span id="cb25-12"><a href="#cb25-12"></a><span class="co">    df-print: kable</span></span>
+<span id="cb25-13"><a href="#cb25-13"></a><span class="an">editor:</span><span class="co"> visual</span></span>
+<span id="cb25-14"><a href="#cb25-14"></a><span class="co">---</span></span>
+<span id="cb25-15"><a href="#cb25-15"></a></span>
+<span id="cb25-16"><a href="#cb25-16"></a><span class="co">&lt;!-- &gt; to strzalka --&gt;</span></span>
+<span id="cb25-17"><a href="#cb25-17"></a><span class="co">&lt;!-- x %&gt;% sin() %&gt;% cos() - wrapowanie funkcji--&gt;</span> </span>
+<span id="cb25-18"><a href="#cb25-18"></a></span>
+<span id="cb25-19"><a href="#cb25-19"></a><span class="fu">## Załadowanie paczek</span></span>
+<span id="cb25-20"><a href="#cb25-20"></a>przez fakt identycznych nazw funkcji sortowania data.frame'ów w paczce za pomocą biblioteki 'conflicted' wybrałem paczki które należy traktować jako pierwsze domyślne.</span>
+<span id="cb25-21"><a href="#cb25-21"></a><span class="in">```{r load, warning = FALSE}</span></span>
+<span id="cb25-22"><a href="#cb25-22"></a><span class="fu">library</span>(readr)</span>
+<span id="cb25-23"><a href="#cb25-23"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb25-24"><a href="#cb25-24"></a><span class="fu">library</span>(nycflights13)</span>
+<span id="cb25-25"><a href="#cb25-25"></a><span class="in">```</span></span>
+<span id="cb25-26"><a href="#cb25-26"></a></span>
+<span id="cb25-27"><a href="#cb25-27"></a><span class="fu">## Utworzenie zbiorów danych</span></span>
+<span id="cb25-28"><a href="#cb25-28"></a><span class="ss">- </span>*zbiór danych sales_data ze sprzedażą wg produktów i kwartałów*</span>
+<span id="cb25-29"><a href="#cb25-29"></a><span class="ss">- </span>*zbiór danych sales_data poszerzony o 6 dodatkowych kategorii*</span>
+<span id="cb25-30"><a href="#cb25-30"></a><span class="in">```{r tworzenie danych}</span></span>
+<span id="cb25-31"><a href="#cb25-31"></a><span class="co"># Utwórz przykładowe dane</span></span>
+<span id="cb25-32"><a href="#cb25-32"></a></span>
+<span id="cb25-33"><a href="#cb25-33"></a><span class="co"># pierwszy dataset</span></span>
+<span id="cb25-34"><a href="#cb25-34"></a><span class="fu">set.seed</span>(<span class="dv">15</span><span class="sc">*</span><span class="dv">101</span>) <span class="co"># zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101</span></span>
+<span id="cb25-35"><a href="#cb25-35"></a>produkty <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Produkt_A"</span>, <span class="st">"Produkt_B"</span>, <span class="st">"Produkt_C"</span>)</span>
+<span id="cb25-36"><a href="#cb25-36"></a>kwartały <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Q1"</span>, <span class="st">"Q2"</span>, <span class="st">"Q3"</span>, <span class="st">"Q4"</span>)</span>
+<span id="cb25-37"><a href="#cb25-37"></a></span>
+<span id="cb25-38"><a href="#cb25-38"></a>sales_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb25-39"><a href="#cb25-39"></a>  <span class="at">Produkt =</span> <span class="fu">rep</span>(produkty, <span class="at">each =</span> <span class="fu">length</span>(kwartały)),</span>
+<span id="cb25-40"><a href="#cb25-40"></a>  <span class="at">Q1 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb25-41"><a href="#cb25-41"></a>  <span class="at">Q2 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb25-42"><a href="#cb25-42"></a>  <span class="at">Q3 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>),</span>
+<span id="cb25-43"><a href="#cb25-43"></a>  <span class="at">Q4 =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">12</span>)</span>
+<span id="cb25-44"><a href="#cb25-44"></a>)</span>
+<span id="cb25-45"><a href="#cb25-45"></a></span>
+<span id="cb25-46"><a href="#cb25-46"></a></span>
+<span id="cb25-47"><a href="#cb25-47"></a></span>
+<span id="cb25-48"><a href="#cb25-48"></a><span class="co"># drugi dataset</span></span>
+<span id="cb25-49"><a href="#cb25-49"></a><span class="fu">set.seed</span>(<span class="dv">15</span><span class="sc">*</span><span class="dv">101</span>) <span class="co"># zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101</span></span>
+<span id="cb25-50"><a href="#cb25-50"></a>produkty <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Produkt_A"</span>, <span class="st">"Produkt_B"</span>, <span class="st">"Produkt_C"</span>)</span>
+<span id="cb25-51"><a href="#cb25-51"></a>sklepy <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Sklep_X"</span>, <span class="st">"Sklep_Y"</span>, <span class="st">"Sklep_Z"</span>)</span>
+<span id="cb25-52"><a href="#cb25-52"></a>miesiace <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Styczeń"</span>, <span class="st">"Luty"</span>, <span class="st">"Marzec"</span>)</span>
+<span id="cb25-53"><a href="#cb25-53"></a></span>
+<span id="cb25-54"><a href="#cb25-54"></a>sales_data_advanced <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb25-55"><a href="#cb25-55"></a>  <span class="at">Produkt =</span> <span class="fu">rep</span>(produkty, <span class="at">each =</span> <span class="fu">length</span>(sklepy) <span class="sc">*</span> <span class="fu">length</span>(miesiace)),</span>
+<span id="cb25-56"><a href="#cb25-56"></a>  <span class="at">Sklep =</span> <span class="fu">rep</span>(sklepy, <span class="at">times =</span> <span class="fu">length</span>(produkty) <span class="sc">*</span> <span class="fu">length</span>(miesiace)),</span>
+<span id="cb25-57"><a href="#cb25-57"></a>  <span class="at">Miesiac =</span> <span class="fu">rep</span>(miesiace, <span class="at">each =</span> <span class="fu">length</span>(produkty) <span class="sc">*</span> <span class="fu">length</span>(sklepy)),</span>
+<span id="cb25-58"><a href="#cb25-58"></a>  <span class="at">Sprzedaz =</span> <span class="fu">sample</span>(<span class="dv">100</span><span class="sc">:</span><span class="dv">500</span>, <span class="dv">27</span>),</span>
+<span id="cb25-59"><a href="#cb25-59"></a>  <span class="at">Koszty =</span> <span class="fu">sample</span>(<span class="dv">30</span><span class="sc">:</span><span class="dv">200</span>, <span class="dv">27</span>),</span>
+<span id="cb25-60"><a href="#cb25-60"></a>  <span class="at">Zysk =</span> <span class="cn">NA</span></span>
+<span id="cb25-61"><a href="#cb25-61"></a>)</span>
+<span id="cb25-62"><a href="#cb25-62"></a>sales_data_advanced<span class="sc">$</span>Zysk <span class="ot">&lt;-</span> sales_data_advanced<span class="sc">$</span>Sprzedaz <span class="sc">-</span> sales_data_advanced<span class="sc">$</span>Koszty</span>
+<span id="cb25-63"><a href="#cb25-63"></a><span class="in">```</span></span>
+<span id="cb25-64"><a href="#cb25-64"></a></span>
+<span id="cb25-65"><a href="#cb25-65"></a><span class="fu">## Analiza zbioru danych sales_data</span></span>
+<span id="cb25-66"><a href="#cb25-66"></a></span>
+<span id="cb25-67"><a href="#cb25-67"></a>**Wyświetlenie orginalnego dataframe'u**</span>
+<span id="cb25-68"><a href="#cb25-68"></a><span class="in">```{r }</span></span>
+<span id="cb25-69"><a href="#cb25-69"></a>sales_data</span>
+<span id="cb25-70"><a href="#cb25-70"></a><span class="in">```</span></span>
+<span id="cb25-71"><a href="#cb25-71"></a></span>
+<span id="cb25-72"><a href="#cb25-72"></a><span class="ss">1. </span>**Zmieniam format za pomocą funkcji pivot_longer()**</span>
+<span id="cb25-73"><a href="#cb25-73"></a><span class="in">```{r pivot_longer}</span></span>
+<span id="cb25-74"><a href="#cb25-74"></a>sales_data_2 <span class="ot">&lt;-</span> sales_data  <span class="sc">|&gt;</span> <span class="fu">pivot_longer</span>(<span class="at">col =</span> <span class="sc">!</span>Produkt, <span class="at">names_to=</span><span class="st">"Kwartal"</span>, <span class="at">values_to=</span><span class="st">"Sprzedaz"</span>)</span>
+<span id="cb25-75"><a href="#cb25-75"></a><span class="in">```</span></span>
+<span id="cb25-76"><a href="#cb25-76"></a></span>
+<span id="cb25-77"><a href="#cb25-77"></a><span class="ss">2. </span>**Stwórz tabelę podsumowującą, która pokaże całkowitą sprzedaż dla każdego produktu we wszystkich kwartałach. Możesz użyć funkcji group_by() i summarize() z pakietu dplyr.**</span>
+<span id="cb25-78"><a href="#cb25-78"></a></span>
+<span id="cb25-79"><a href="#cb25-79"></a><span class="in">```{r sprzedaz_kwartalami}</span></span>
+<span id="cb25-80"><a href="#cb25-80"></a>sales_data_3 <span class="ot">&lt;-</span> sales_data_2 <span class="sc">|&gt;</span> <span class="fu">group_by</span>(Produkt, Kwartal) <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">calkowita_sprzedaz =</span> <span class="fu">sum</span>(Sprzedaz), <span class="at">.groups=</span>(<span class="st">'drop'</span>))</span>
+<span id="cb25-81"><a href="#cb25-81"></a>sales_data_3</span>
+<span id="cb25-82"><a href="#cb25-82"></a><span class="in">```</span></span>
+<span id="cb25-83"><a href="#cb25-83"></a></span>
+<span id="cb25-84"><a href="#cb25-84"></a><span class="ss">3. </span>**Teraz użyj funkcji pivot_wider() do przywrócenia danych w formacie szerokim.**</span>
+<span id="cb25-85"><a href="#cb25-85"></a></span>
+<span id="cb25-86"><a href="#cb25-86"></a><span class="in">```{r pivot_wider}</span></span>
+<span id="cb25-87"><a href="#cb25-87"></a>sales_data_back <span class="ot">&lt;-</span> sales_data_3 <span class="sc">|&gt;</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Kwartal, <span class="at">values_from =</span> calkowita_sprzedaz)</span>
+<span id="cb25-88"><a href="#cb25-88"></a>sales_data_back</span>
+<span id="cb25-89"><a href="#cb25-89"></a><span class="in">```</span></span>
+<span id="cb25-90"><a href="#cb25-90"></a></span>
+<span id="cb25-91"><a href="#cb25-91"></a><span class="fu">## Analiza zbioru danych sales_data_advanced</span></span>
+<span id="cb25-92"><a href="#cb25-92"></a><span class="ss">1. </span>**Filtrowanie danych: Wybierz tylko te rekordy, gdzie zysk jest dodatni.**</span>
+<span id="cb25-93"><a href="#cb25-93"></a></span>
+<span id="cb25-94"><a href="#cb25-94"></a><span class="in">```{r dodatni_zysk}</span></span>
+<span id="cb25-95"><a href="#cb25-95"></a>positive_profit <span class="ot">&lt;-</span> sales_data_advanced <span class="sc">|&gt;</span> <span class="fu">filter</span>(Zysk<span class="sc">&gt;</span><span class="dv">0</span>)</span>
+<span id="cb25-96"><a href="#cb25-96"></a>positive_profit</span>
+<span id="cb25-97"><a href="#cb25-97"></a><span class="in">```</span></span>
+<span id="cb25-98"><a href="#cb25-98"></a></span>
+<span id="cb25-99"><a href="#cb25-99"></a><span class="ss">2. </span>**Sortowanie danych: Posortuj dane według malejącego zysku, a następnie według nazw produktów rosnąco.**</span>
+<span id="cb25-100"><a href="#cb25-100"></a></span>
+<span id="cb25-101"><a href="#cb25-101"></a><span class="in">```{r malejacy_zysk}</span></span>
+<span id="cb25-102"><a href="#cb25-102"></a>sorted <span class="ot">&lt;-</span> sales_data_advanced <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(Zysk), Produkt)</span>
+<span id="cb25-103"><a href="#cb25-103"></a>sorted</span>
+<span id="cb25-104"><a href="#cb25-104"></a><span class="in">```</span></span>
+<span id="cb25-105"><a href="#cb25-105"></a></span>
+<span id="cb25-106"><a href="#cb25-106"></a><span class="ss">3. </span>**Tworzenie nowych kolumn: Dodaj kolumnę Marza_Procentowa, która będzie zawierała procentową marżę zysku dla każdego rekordu.**</span>
+<span id="cb25-107"><a href="#cb25-107"></a></span>
+<span id="cb25-108"><a href="#cb25-108"></a><span class="in">```{r marza}</span></span>
+<span id="cb25-109"><a href="#cb25-109"></a>margin <span class="ot">&lt;-</span> sorted <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Marza_Procentowa =</span> (Zysk<span class="sc">/</span>(Sprzedaz<span class="sc">+</span>Koszty))<span class="sc">*</span><span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Marza_Procentowa =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(Marza_Procentowa, <span class="dv">2</span>), <span class="st">"%"</span>))</span>
+<span id="cb25-110"><a href="#cb25-110"></a>margin</span>
+<span id="cb25-111"><a href="#cb25-111"></a><span class="in">```</span></span>
+<span id="cb25-112"><a href="#cb25-112"></a></span>
+<span id="cb25-113"><a href="#cb25-113"></a><span class="ss">4. </span>**Agregacja danych: Stwórz tabelę, która pokaże średnią sprzedaż, koszty i zysk dla każdego sklepu.**</span>
+<span id="cb25-114"><a href="#cb25-114"></a></span>
+<span id="cb25-115"><a href="#cb25-115"></a><span class="in">```{r nowa_tabela}</span></span>
+<span id="cb25-116"><a href="#cb25-116"></a>new_tab <span class="ot">&lt;-</span> margin <span class="sc">|&gt;</span></span>
+<span id="cb25-117"><a href="#cb25-117"></a>           <span class="fu">group_by</span>(Sklep) <span class="sc">|&gt;</span> </span>
+<span id="cb25-118"><a href="#cb25-118"></a>           <span class="fu">summarise</span>(<span class="at">avg_sprzedaz =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Sprzedaz),<span class="dv">0</span>),<span class="at">avg_koszty =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Koszty),<span class="dv">0</span>), <span class="at">avg_zysk =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Zysk),<span class="dv">0</span>))</span>
+<span id="cb25-119"><a href="#cb25-119"></a>new_tab</span>
+<span id="cb25-120"><a href="#cb25-120"></a><span class="in">```</span></span>
+<span id="cb25-121"><a href="#cb25-121"></a></span>
+<span id="cb25-122"><a href="#cb25-122"></a><span class="ss">5. </span>**Pivotowanie danych: Przekształć dane w taki sposób, aby w jednym wierszu były informacje o sprzedaży, kosztach i zysku dla danego produktu w danym sklepie w danym miesiącu.**</span>
+<span id="cb25-123"><a href="#cb25-123"></a></span>
+<span id="cb25-124"><a href="#cb25-124"></a><span class="in">```{r scalanie_wierszow}</span></span>
+<span id="cb25-125"><a href="#cb25-125"></a>sorted</span>
+<span id="cb25-126"><a href="#cb25-126"></a><span class="in">```</span></span>
+<span id="cb25-127"><a href="#cb25-127"></a></span>
+<span id="cb25-128"><a href="#cb25-128"></a>*Mam problem ze zrozumieniem polecenia zadania - patrząc na jego opis, nie widzę różnicy względem pierwotnego zbioru danych, ponieważ w każdym wierszu znajdują się takie same dane jakie wymaga od nas to zadanie.*</span>
+<span id="cb25-129"><a href="#cb25-129"></a></span>
+<span id="cb25-130"><a href="#cb25-130"></a><span class="ss">6. </span>**Dodatkowe przekształcenie danych: Dodaj nową kolumnę Koszty_na_Sprzedaz reprezentującą procentowy udział kosztów w sprzedaży.**</span>
+<span id="cb25-131"><a href="#cb25-131"></a></span>
+<span id="cb25-132"><a href="#cb25-132"></a><span class="in">```{r koszty_na_sprzedaz}</span></span>
+<span id="cb25-133"><a href="#cb25-133"></a>koszty <span class="ot">&lt;-</span> sorted <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Koszty_na_Sprzedaz =</span> <span class="fu">round</span>((Koszty<span class="sc">/</span>Sprzedaz)<span class="sc">*</span><span class="dv">100</span>, <span class="dv">2</span>))</span>
+<span id="cb25-134"><a href="#cb25-134"></a>koszty</span>
+<span id="cb25-135"><a href="#cb25-135"></a><span class="in">```</span></span>
+<span id="cb25-136"><a href="#cb25-136"></a></span>
+<span id="cb25-137"><a href="#cb25-137"></a><span class="ss">7. </span>**Powrót do szerokiego formatu: Przekształć dane tak, aby wrócić do pierwotnego formatu, gdzie każdy wiersz reprezentuje produkt w danym sklepie w danym miesiącu.**</span>
+<span id="cb25-138"><a href="#cb25-138"></a></span>
+<span id="cb25-139"><a href="#cb25-139"></a><span class="in">```{r pivot_wider__}</span></span>
+<span id="cb25-140"><a href="#cb25-140"></a>koszty</span>
+<span id="cb25-141"><a href="#cb25-141"></a><span class="in">```</span></span>
+<span id="cb25-142"><a href="#cb25-142"></a></span>
+<span id="cb25-143"><a href="#cb25-143"></a>*Nie wykonałem polecenia 6. którego nie zrozumiałem, więc domniemuję że nie zmieniam nic.*</span>
+<span id="cb25-144"><a href="#cb25-144"></a></span>
+<span id="cb25-145"><a href="#cb25-145"></a><span class="ss">8. </span>**Zaawansowane wybieranie danych: Wybierz rekordy z największymi kosztami na sprzedaż dla każdego produktu.**</span>
+<span id="cb25-146"><a href="#cb25-146"></a></span>
+<span id="cb25-147"><a href="#cb25-147"></a></span>
+<span id="cb25-148"><a href="#cb25-148"></a><span class="in">```{r najwieksze_koszty}</span></span>
+<span id="cb25-149"><a href="#cb25-149"></a>max_by_prod <span class="ot">&lt;-</span> koszty <span class="sc">|&gt;</span> <span class="fu">group_by</span>(Produkt) <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(Koszty_na_Sprzedaz)</span>
+<span id="cb25-150"><a href="#cb25-150"></a>max_by_prod</span>
+<span id="cb25-151"><a href="#cb25-151"></a><span class="in">```</span></span>
+<span id="cb25-152"><a href="#cb25-152"></a></span>
+<span id="cb25-153"><a href="#cb25-153"></a><span class="fu">## Analiza zbioru danych flights</span></span>
+<span id="cb25-154"><a href="#cb25-154"></a><span class="ss">1. </span>Określ, który przewoźnik ma największe opóźnienia przylotu? </span>
+<span id="cb25-155"><a href="#cb25-155"></a></span>
+<span id="cb25-156"><a href="#cb25-156"></a><span class="in">```{r dodaj_bl}</span></span>
+<span id="cb25-157"><a href="#cb25-157"></a>fl <span class="ot">&lt;-</span> flights</span>
+<span id="cb25-158"><a href="#cb25-158"></a>carrier_delays <span class="ot">&lt;-</span> fl <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(arr_delay)) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(carrier) <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">avg_arr_delay =</span> <span class="fu">round</span>(<span class="fu">mean</span>(arr_delay), <span class="dv">2</span>), <span class="at">.groups=</span><span class="st">'drop'</span>) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(avg_arr_delay))</span>
+<span id="cb25-159"><a href="#cb25-159"></a>carrier_delays</span>
+<span id="cb25-160"><a href="#cb25-160"></a></span>
+<span id="cb25-161"><a href="#cb25-161"></a><span class="fu">cat</span>(<span class="st">"F9 ma największe opóźnienia ze średnią 21.92 minuty na jeden lot."</span>)</span>
+<span id="cb25-162"><a href="#cb25-162"></a></span>
+<span id="cb25-163"><a href="#cb25-163"></a></span>
+<span id="cb25-164"><a href="#cb25-164"></a><span class="in">```</span></span>
+<span id="cb25-165"><a href="#cb25-165"></a></span>
+<span id="cb25-166"><a href="#cb25-166"></a>*Podglądając przebieg zmiennych nie wygląda na to aby opóźnienia miały związek także z lotniskiem docelowym, dane te są zbyt mało skoorelowane by można było to dostrzec gołym okiem.*</span>
+<span id="cb25-167"><a href="#cb25-167"></a></span>
+<span id="cb25-168"><a href="#cb25-168"></a>*Musiałem dodatkowo usunąć rekordy zwierające nieokreśloną ilość opóźnienia, ponieważ funkcja mean nie działała przy nich poprawnie.*</span>
+<span id="cb25-169"><a href="#cb25-169"></a></span>
+<span id="cb25-170"><a href="#cb25-170"></a><span class="ss">2. </span>Znajdź loty, które są najbardziej opóźnione przy odlocie z każdego lotniska.</span>
+<span id="cb25-171"><a href="#cb25-171"></a></span>
+<span id="cb25-172"><a href="#cb25-172"></a><span class="in">```{r najb_opoznione }</span></span>
+<span id="cb25-173"><a href="#cb25-173"></a><span class="co">#| warning: false</span></span>
+<span id="cb25-174"><a href="#cb25-174"></a>airport_delay <span class="ot">&lt;-</span> fl <span class="sc">|&gt;</span> </span>
+<span id="cb25-175"><a href="#cb25-175"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(arr_delay)) <span class="sc">|&gt;</span> </span>
+<span id="cb25-176"><a href="#cb25-176"></a>  <span class="fu">group_by</span>(origin, flight) <span class="sc">|&gt;</span> </span>
+<span id="cb25-177"><a href="#cb25-177"></a>  <span class="fu">summarise</span>(<span class="at">origin =</span> origin, <span class="at">destination =</span> dest, <span class="at">flight =</span>   flight, <span class="at">avg_dep_delay =</span> <span class="fu">mean</span>(dep_delay), <span class="at">.groups=</span><span class="st">'drop'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb25-178"><a href="#cb25-178"></a>  <span class="fu">group_by</span>(origin) <span class="sc">|&gt;</span></span>
+<span id="cb25-179"><a href="#cb25-179"></a>  <span class="fu">slice_max</span>(avg_dep_delay,<span class="at">n=</span><span class="dv">1</span>)</span>
+<span id="cb25-180"><a href="#cb25-180"></a></span>
+<span id="cb25-181"><a href="#cb25-181"></a><span class="co"># przed kazda operacja podaje group by wzgledem czego chce grupowac</span></span>
+<span id="cb25-182"><a href="#cb25-182"></a>airport_delay</span>
+<span id="cb25-183"><a href="#cb25-183"></a></span>
+<span id="cb25-184"><a href="#cb25-184"></a></span>
+<span id="cb25-185"><a href="#cb25-185"></a><span class="in">```</span></span>
+<span id="cb25-186"><a href="#cb25-186"></a></span>
+<span id="cb25-187"><a href="#cb25-187"></a>*założyłem, że kolumna flight odpowiada za numer lotu przez co mogłem pogrupować loty.*</span>
+<span id="cb25-188"><a href="#cb25-188"></a></span>
+<span id="cb25-189"><a href="#cb25-189"></a><span class="fu">## Analiza zbioru danych z listy Billboardu.</span></span>
+<span id="cb25-190"><a href="#cb25-190"></a><span class="ss">1. </span>**Wczytaj zbiór danych za pomocą funkcji read_csv()**</span>
+<span id="cb25-191"><a href="#cb25-191"></a></span>
+<span id="cb25-192"><a href="#cb25-192"></a><span class="in">```{r read_csv}</span></span>
+<span id="cb25-193"><a href="#cb25-193"></a>billboard <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"billboard.csv"</span>)</span>
+<span id="cb25-194"><a href="#cb25-194"></a><span class="in">```</span></span>
+<span id="cb25-195"><a href="#cb25-195"></a></span>
+<span id="cb25-196"><a href="#cb25-196"></a></span>
+<span id="cb25-197"><a href="#cb25-197"></a><span class="ss">2. </span>**Sporządź tabelę zawierającą wszystkie piosenki, które spadły z listy we wrześniu 2000.**</span>
+<span id="cb25-198"><a href="#cb25-198"></a></span>
+<span id="cb25-199"><a href="#cb25-199"></a>*Nie będzie to takie proste, ponieważ mam jedynie podaną datę wejścia oraz serię tygodni, jakie miejsce zajmował utwór. 'NA' oznacza że utworu już nie ma, więc muszę znaleźć po ilu dniach utwory opuściły playlistę, następnie dodać do daty wejścia na billboard i sprawdzić czy data zawiera się we wrześniu.*</span>
+<span id="cb25-200"><a href="#cb25-200"></a></span>
+<span id="cb25-201"><a href="#cb25-201"></a><span class="in">```{r spadly_z_listy}</span></span>
+<span id="cb25-202"><a href="#cb25-202"></a>fallen <span class="ot">&lt;-</span> billboard <span class="sc">|&gt;</span> </span>
+<span id="cb25-203"><a href="#cb25-203"></a><span class="fu">select</span>(track, date.entered)<span class="sc">|&gt;</span> </span>
+<span id="cb25-204"><a href="#cb25-204"></a><span class="fu">mutate</span>(<span class="at">days_on_list =</span> <span class="dv">7</span> <span class="sc">*</span> <span class="fu">apply</span>(billboard[,<span class="dv">8</span><span class="sc">:</span><span class="fu">length</span>(billboard[<span class="dv">1</span>,])], <span class="at">MARGIN=</span><span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x)))) <span class="sc">|&gt;</span> </span>
+<span id="cb25-205"><a href="#cb25-205"></a><span class="fu">mutate</span>(<span class="at">date_dropped =</span> date.entered <span class="sc">+</span> days_on_list) <span class="sc">|&gt;</span> </span>
+<span id="cb25-206"><a href="#cb25-206"></a><span class="fu">filter</span>(date_dropped <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(<span class="st">"2000-09-01"</span>) <span class="sc">&amp;</span> date_dropped <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2000-09-30"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-207"><a href="#cb25-207"></a><span class="fu">arrange</span>(date_dropped)</span>
+<span id="cb25-208"><a href="#cb25-208"></a></span>
+<span id="cb25-209"><a href="#cb25-209"></a></span>
+<span id="cb25-210"><a href="#cb25-210"></a>fallen</span>
+<span id="cb25-211"><a href="#cb25-211"></a></span>
+<span id="cb25-212"><a href="#cb25-212"></a><span class="in">```</span></span>
+<span id="cb25-213"><a href="#cb25-213"></a></span>
+<span id="cb25-214"><a href="#cb25-214"></a><span class="ss">3. </span>**Określ, która z piosenek danego gatunku była na liście najdłużej.**</span>
+<span id="cb25-215"><a href="#cb25-215"></a></span>
+<span id="cb25-216"><a href="#cb25-216"></a>*Obliczam długość dni liście billboardu, grupuje wzgledem gatunku, i wykonuje filtracje po dlugosci. W przypadku gdy rekordowe utwory byly po tyle samo dni zostawiam wszystkie*</span>
+<span id="cb25-217"><a href="#cb25-217"></a><span class="in">```{r najdluzej_bilboard}</span></span>
+<span id="cb25-218"><a href="#cb25-218"></a>longest_on_billboard <span class="ot">&lt;-</span> billboard <span class="sc">|&gt;</span> <span class="fu">select</span>(track, genre, date.entered) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">days_on_list =</span> <span class="dv">7</span> <span class="sc">*</span> <span class="fu">apply</span>(billboard[,<span class="dv">8</span><span class="sc">:</span><span class="fu">length</span>(billboard[<span class="dv">1</span>,])], <span class="at">MARGIN=</span><span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(x)))) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(genre) <span class="sc">|&gt;</span> <span class="fu">filter</span>(days_on_list <span class="sc">==</span> <span class="fu">max</span>(days_on_list, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(genre)</span>
+<span id="cb25-219"><a href="#cb25-219"></a></span>
+<span id="cb25-220"><a href="#cb25-220"></a></span>
+<span id="cb25-221"><a href="#cb25-221"></a>longest_on_billboard</span>
+<span id="cb25-222"><a href="#cb25-222"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

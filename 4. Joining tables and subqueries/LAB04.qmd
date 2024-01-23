@@ -1,0 +1,181 @@
+---
+title: "Zadanie 4. Przykładowe tabele obrazujące łączenie"
+author: "Gabriel Szewczyk"
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+# Bilbioteki i konfiguracja połączenia z bazą
+
+```{r}
+library(DBI)
+library(RPostgres)
+
+dsn_database = "wbauer_adb_2023"
+dsn_hostname = "pgsql-196447.vipserv.org"
+dsn_port = "5432"
+dsn_uid = "wbauer_adb"
+dsn_pwd = "adb2020"
+
+con <- dbConnect(Postgres(), dbname = dsn_database, host=dsn_hostname, port=dsn_port, user=dsn_uid, password=dsn_pwd)
+```
+
+
+# 1. Znajdź listę wszystkich filmów o tej samej długości.
+Podaję długość, i otrzymuję listę filmów
+```{r}
+length = 47
+same_length <- dbGetQuery(con, sprintf("SELECT title, length FROM film WHERE length = %f", length))
+same_length
+```
+
+# 2. Znajdź wszystkich klientów mieszkających w tym samym mieście.
+Wybrane zostało miasto Londyn, poniżej zaprezentowano wyniki.
+```{r}
+client_from_city<- function(city){
+  if (is.character(city)) {
+    city_customers_list <- dbGetQuery(con, sprintf(
+     "SELECT ct.city, c.first_name, c.last_name
+      FROM customer AS c
+      INNER JOIN address a ON c.address_id = a.address_id
+      INNER JOIN city ct ON a.city_id = ct.city_id 
+      WHERE city = '%s'
+      ORDER BY c.first_name, c.last_name", city))
+    return(city_customers_list)
+  } else {
+    return(NULL)
+  }
+}
+sprintf("Osoby mieszkające w Londynie:")
+client_from_city('London')
+```
+
+# 3. Oblicz średni koszt wypożyczenia wszystkich filmów.
+
+```{r}
+
+avg_price <- dbGetQuery(con, sprintf(
+  "SELECT AVG(p.amount) as avg
+    FROM payment as p
+    INNER JOIN rental r ON p.rental_id = r.rental_id
+    INNER JOIN inventory i ON r.inventory_id = i.inventory_id
+    INNER JOIN film f ON i.film_id = f.film_id
+    GROUP BY f.film_id"))
+
+sprintf("Średni koszt wypożyczenia wszystkich filmów to %.2f", avg_price[1,1])
+```
+
+# 4. Oblicz i wyświetl liczbę filmów we wszystkich kategoriach.
+
+```{r}
+category_of_film <- dbGetQuery(con,
+  "SELECT cat.name AS category, COUNT(fcat.film_id) AS count
+  FROM category AS cat 
+  INNER JOIN film_category fcat ON cat.category_id = fcat.category_id
+  GROUP BY cat.name")
+category_of_film
+
+```
+
+# 5. Wyświetl liczbę wszystkich klientów pogrupowanych według kraju.
+
+```{r}
+clients_by_country <- dbGetQuery(con, 
+  "SELECT ctr.country AS country, COUNT(c.customer_id)AS count
+   FROM customer AS c
+   INNER JOIN address a ON c.address_id = a.address_id
+   INNER JOIN city ct ON a.city_id = ct.city_id
+   INNER JOIN country ctr ON ct.country_id = ctr.country_id
+   GROUP BY ctr.country
+   ORDER BY ctr.country")
+clients_by_country
+```
+
+# 6. Wyświetl informacje o sklepie, który ma więcej niż 100 klientów i mniej niż 300 klientów.
+
+```{r}
+shop_with_100_300_customers <- dbGetQuery(con,"SELECT a.address, ct.city, COUNT(c.customer_id) AS clients 
+ FROM store AS st
+ INNER JOIN address a ON st.address_id = a.address_id
+ INNER JOIN customer c ON st.store_id = c.store_id
+ INNER JOIN city ct ON a.city_id = ct.city_id
+ GROUP BY a.address, ct.city
+ HAVING COUNT(c.customer_id) BETWEEN 100 AND 300")
+shop_with_100_300_customers
+```
+
+# 7. Wybierz wszystkich klientów, którzy oglądali filmy ponad 200 godzin.
+
+```{r}
+client_by_sum_length <- function(sum_min){
+  if (is.integer(sum_min) || is.double(sum_min)) {
+    sum_film_length <- dbGetQuery(con, sprintf(
+      "SELECT c.first_name, c.last_name, SUM(f.length) AS sum
+       FROM customer as c
+       INNER JOIN rental r ON c.customer_id = r.customer_id
+       INNER JOIN inventory i ON r.inventory_id = i.inventory_id
+       INNER JOIN film f ON i.film_id = f.film_id
+       GROUP BY c.first_name, c.last_name
+       HAVING SUM(f.length) >= %f
+       ORDER BY sum, c.last_name, c.first_name", sum_min))
+    return(sum_film_length)
+  } else {
+    return(NULL)
+  }
+}
+
+client_by_sum_length(1200) # input 1200 bo 200h * 60 min to 1200
+```
+
+# 8. Oblicz średnią wartość wypożyczenia filmu.
+Uważam, że to pytanie jest analogiczne do pytania numer 3., zatem powtarzam odpowiedź.
+```{r}
+sprintf("Średni koszt wypożyczenia wszystkich filmów to %.2f", avg_price[1,1])
+```
+
+# 9. Oblicz średnią wartość długości filmu we wszystkich kategoriach.
+
+```{r}
+length_avg <- dbGetQuery(con,
+  "SELECT cat.name AS category, ROUND(AVG(f.length), 2) AS avg
+    FROM category AS cat
+    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id
+    INNER JOIN film f ON fcat.film_id = f.film_id
+    GROUP BY cat.name
+    ORDER BY cat.name ASC")
+length_avg
+```
+
+# 10. Znajdź najdłuższe tytuły filmowe we wszystkich kategoriach.
+
+```{r}
+film_longest <- dbGetQuery(con,
+  "SELECT cat.name AS category, MAX(f.length) AS longest_film
+    FROM category AS cat
+    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id
+    INNER JOIN film f ON fcat.film_id = f.film_id
+    GROUP BY cat.name
+    ORDER BY cat.name ASC")
+film_longest
+```
+
+# 11. Znajdź najdłuższy film we wszystkich kategoriach. Porównaj wynik z pkt 10.
+
+```{r}
+film_longest <- dbGetQuery(con,
+  "SELECT cat.name AS category, f.title, MAX(f.length) AS longest_film
+    FROM category AS cat
+    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id
+    INNER JOIN film f ON fcat.film_id = f.film_id
+    WHERE f.length = 185
+    GROUP BY cat.name, f.title
+    ORDER BY cat.name ASC")
+film_longest
+```
+Wyniki z tabeli z zadania 10. pokrywają się, z tym, że odrzuciliśmy wyniki poniżej 185 minut, ponieważ to był najdłuższy czas filmu. Taki czas miał film aż z 7 kategorii

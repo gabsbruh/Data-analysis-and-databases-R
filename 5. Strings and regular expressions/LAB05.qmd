@@ -1,0 +1,96 @@
+---
+title: "Zadanie 5. Łańcuchy znaków i wyrażenia regularne"
+author: "Gabriel Szewczyk"
+date: 10.11.2023
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+<!-- regexr.com tam masz o regexach, używamy po słówku WHERE, np. WHERE country ~'^p' - gdzie kraj zaczyna sie na p-->
+
+<!-- jesli chcesz otworzyc expected, wpisz load("tests/testthat/expected") -->
+# Bilbioteki i konfiguracja połączenia z bazą
+
+```{r}
+library(DBI)
+library(RPostgres)
+
+dsn_database = "wbauer_adb_2023"
+dsn_hostname = "pgsql-196447.vipserv.org"
+dsn_port = "5432"
+dsn_uid = "wbauer_adb"
+dsn_pwd = "adb2020"
+
+con <- dbConnect(Postgres(), dbname = dsn_database, host=dsn_hostname, port=dsn_port, user=dsn_uid, password=dsn_pwd)
+```
+
+# 1.Znajdź wszystkie nazwy krajów rozpoczynających się na P.
+
+```{r}
+p_countries <- dbGetQuery(con, 
+        "SELECT country FROM country WHERE country LIKE 'P%'")
+p_countries
+```
+
+# 2.Znajdź wszystkie nazwy krajów rozpoczynających się P i kończących na s.
+
+```{r}
+p_do_s <- dbGetQuery(con, 
+        "SELECT country FROM country WHERE country LIKE 'P%s'")
+p_do_s
+```
+
+# 3.Znajdź wszystkie tytuły filmów, w których znajdują się cyfry.
+
+```{r}
+titles_with_numbers  <- dbGetQuery(con,   
+        "SELECT title FROM film WHERE title ~ '\\d'")
+titles_with_numbers
+```
+
+# 4.Znajdź wszystkich pracowników z podwójnym imieniem lub nazwiskiem.
+
+```{r}
+double_first_last_name <- dbGetQuery(con, 
+      "SELECT first_name, last_name FROM staff WHERE (first_name ~ ' ') OR (last_name ~ ' ')")
+double_first_last_name
+```
+
+# 5.Znajdź wszystkie nazwiska aktorów rozpoczynających się od P lub C i mających 5 znaków.
+
+```{r}
+chars_5 <- dbGetQuery(con, "SELECT last_name FROM actor WHERE last_name LIKE 'P____' OR last_name LIKE 'C____'")
+chars_5
+```
+
+# 6.Znajdź wszystkie tytuły filmów, w których występują słowa Trip lub Alone.
+
+```{r}
+trip_alone <- dbGetQuery(con, "SELECT title FROM film WHERE title ~ 'Trip|Alone'")
+trip_alone
+```
+
+# 7.Przeanalizuj zapytania: 
+#### &nbsp;&nbsp;&nbsp;&nbsp; 7.1.select first_name from actor where first_name ~ ‘^Al[a:z,1:9]*’
+
+```{r}
+query7_1 <- dbGetQuery(con, "SELECT first_name FROM actor WHERE first_name ~ '^Al[a:z,1:9]*'")
+query7_1
+```
+
+Zapytanie to służy do znalezienia imion aktorów zaczynających się na Al, po których występuje dowolny ciąg liter czy liczb.
+
+#### &nbsp;&nbsp;&nbsp;&nbsp; 7.2.select first_name from actor where first_name ~* ‘^al[a:z,1:9]*’
+
+```{r}
+query7_2 <- dbGetQuery(con, "SELECT first_name FROM actor WHERE first_name ~* '^al[a:z,1:9]*'")
+query7_2
+```
+
+Porównując to zapytanie do poprzedniego, zwróciło ono identyczny wynik, ponieważ wszystkie imiona aktorów zaczynają się od dużej litery. Różnica polega na składni: w drugim zapytaniu zastosowano '~*', które nie uwzględnia wielkości liter, przez co można było użyc początku '^al' (z małej litery). W pierwszym przypadku, aby wyniki były identyczne, z racji na zastosowanie '~' czyli dopasowania do wzorca gdzie wielkość liter ma znaczenie, należało zastosować '^Al', aby wyniki były takie same (z dużej litery).

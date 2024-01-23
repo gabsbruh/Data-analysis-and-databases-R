@@ -1,0 +1,240 @@
+---
+title: "Zadanie 12. Wczytywanie danych."
+author: "Gabriel Szewczyk"
+date: 01.20.2024
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+    code-block-border-left: true
+editor: visual
+---
+
+# Formaty danych i apache arrow
+
+```{r, warning=FALSE}
+# install.packages("arrow")
+# install.packages("xml2")
+# install.packages("haven")
+# install.packages("jsonlite")
+library(jsonlite) #dla plików .json
+library(haven) #dla plików .sav
+library(xml2) #dla plików .xml i .xsd
+library(arrow)
+library(dplyr)
+
+```
+
+## Zadanie 1: plik JSON
+
+1.  Pobierz z serwisu Kaggle plik: <https://www.kaggle.com/datasets/rtatman/iris-dataset-json-version>
+2.  Zapoznaj się z plikiem otwierając go w notatniku
+3.  Wczytaj go (*fromJSON()*) i wyświetl parę pierwszych wierszy
+
+```{r iris_json}
+json <- fromJSON('iris.json')
+head(json, 5)
+```
+
+## Zadanie 2: .sav - pliki oprogramowania SPSS
+
+1.  Wczytaj i wyświetl pierwsze wiersze pliku *health_control.sav*
+
+```{r health_control}
+health_control <- read_sav('health_control.sav')
+head(health_control, 4)
+```
+
+## Zadanie 3: .csv .txt
+
+1.  Wczytaj plik *example.txt (read.csv()).* Sprawdź jaki separator jest wykorzystywany w pliku. Ustaw parametr *na.strings.*
+2.  Zapisz wczytane dane to pliku csv
+
+```{r example}
+# example <- read.csv('example.txt', na.strings=c(-1,''))
+# write.csv(example, "C:\Users\gabso\OneDrive\Pulpit\study\Analiza i Bazy Danych\lab13\laboratorium-13-GabsonZZZ", row.names = 1.)
+```
+
+3.  Pojawiający się błąd wynika to z faktu że dane zostały zapisane z kolumną z numerami wierszy, jednak bez jej nazwy. W celu naprawy błędnu można na przykład ręcznie dodać nazwę kolumny edytując plik w notatniku, a następnie wczytać go z parametrem *row.names = 1.*
+4.  Zapisz wczytany plik do formatu csv, pomijając indeksy wierszy (*write.csv(), ustaw row.names = FALSE*)
+5.  Obejrzyj zapisany plik w notatniku
+
+```{r}
+example <- read.csv('example.txt', na.strings=c(-1, ''), sep=".")
+path <- r"{C:\Users\gabso\OneDrive\Pulpit\study\Analiza i Bazy Danych\lab13\laboratorium-13-GabsonZZZ}"
+write.csv(example, file.path(path, "example.csv"), row.names = FALSE)
+```
+
+## Zadanie 4: Pliki XML
+
+XML to format danych oparty o znacznikil. Pliki tego typu można otworzyć np. notatnikiem, w celu ręcznego przejrzenia pliku, gdyż dane zapisane są w formacie czytelnym dla ludzi.
+
+1.  Korzystając z pakietu xml2 otwórz plik *cd_catalog.xml (read_xml())*
+2.  Wypisz wszystkie tytuły filmów znajdujące się w pliku *(xml_find_all(data, "znacznik/znacznik_wewnatrz_znacznika/..."), xml_text())*
+3.  Oblicz ile płyt znajduje się w pliku
+4.  Oblicz sumę cen wszystkich płyt (*as.numeric()*)
+
+```{r cd_catalog}
+cd_catalog <- read_xml("cd_catalog.xml")
+titles <- xml_find_all(cd_catalog, "//TITLE")
+for (wezel in titles) {
+  cat(xml_text(wezel))
+}
+
+count_cd <- xml_length(cd_catalog)
+cat("liczba plyt:", count_cd)
+
+prices_xml <- xml_find_all(cd_catalog, "//PRICE")
+
+prices <- c()
+for (wezel in prices_xml) {
+  prices <- c(prices, as.numeric(xml_text(wezel)))
+}
+prices_sum <- sum(prices)
+cat("suma cen plyt:", prices_sum)
+```
+
+## Zadanie 5: Plik XML i weryfikowanie szablonem XSD
+
+Często podczas pracy z plikami XML zachodzi poprawność zweryfikowania czy spełnia on wymagania strukturalne i semantyczne. Przydatne jest to na przykład gdy towrzymy funkcję operującą na plikach z różnych źródeł i nie chcemy aby niepoprawne pliki spowodowały błędy. Służą do tego pliki XSD
+
+1.  Korzystając z funkcji xml_validate*()* spawdź czy plik books.xml jest zgodny z schematem
+2.  Jeśeli występują jakieś problemy, otwórz plik xml (na przykład w notatniku) i dokonaj stosownych poprawek (jeżeli dodajesz jakieś dane, możesz wybrać dowolne wartości). Następnie przeprowadź walidację raz jeszcze.
+
+```{r read_xml}
+books_xml <- read_xml('books.xml')
+books_xsd <- read_xml('books.xsd')
+xml_validate(books_xml, books_xsd)
+
+```
+
+attr(,"errors")
+
+[1] "Element 'pub_date': This element is not expected. Expected is ( price )." 
+[2] "Element 'review': This element is not expected. Expected is ( pub_date )."
+
+**Do 1 rekordu nalezalo dodac cene ksiazki, a do 2 rekordu date publikacji** 
+
+
+## Zadanie 6: Apache arrow vs in memory
+
+Link do pobrania pliku do zadania (ok. 100MB)
+
+<https://aghedupl-my.sharepoint.com/:u:/g/personal/bargaw_agh_edu_pl/EW4FURQwm5tDgfLARz1g_lkBEnLRR82DgZuGFS4qeyuLWw?e=hxxQam>
+
+Zadanie ma na celu porównanie przetwarzania danych w różnych formatach przy użyciu różnych metod:
+
+1.  Wczytaj dane z pliku *organizations-1000000.csv* przy pomocy funkcji *read.csv()*
+2.  Wczytaj dane z pliku *organizations-1000000.csv* przy pomocy funkcji *open_dataset()*
+3.  Zapisz plik csv w formacie *.parquet. W tym celu użyj funkcji* *write\_*dataset*()*. Jako *dataset* podaj obiekt z wczytanym plikiem csv z punktu 2. Jako *path* ścieżkę gdzie plik ma być zapisany, a fomat ustaw jako *"parquet"*
+4.  Wczytaj plik utworzony w poprzednim punkcie (*open_dataset()*).
+5.  Sprawdź ile miejsca w pamięci zajmuje każdy z wczytanych obiektów. Zmierz czas jaki jest potrzebny na każdy rodzaj wczytania danych.
+6.  Porównaj ile miejsca na dysku zajmuje format csv, a ile parquet
+7.  Spawdź ile wierszy danych zawiera analizowany plik csv
+
+```{r arrow1}
+
+# czas read.csv
+start.time <- Sys.time()
+organisations <- read.csv('organizations-1000000.csv')
+end.time <- Sys.time()
+time.taken <- round(end.time - start.time,2)
+
+
+# czas open_dataset_csv
+start.time <- Sys.time()
+dataset <- open_dataset('organizations-1000000.csv', format='csv')
+end.time <- Sys.time()
+time.taken_1 <- round(end.time - start.time,2)
+
+# zapisanie do pliku w postaci parquet
+write_dataset(dataset, "C:/Users/gabso/OneDrive/Pulpit/study/Analiza i Bazy Danych/lab13/laboratorium-13-GabsonZZZ", format='parquet')
+
+# czas parquet
+start.time <- Sys.time()
+dataset_2 <- open_dataset('part-0.parquet', format='parquet')
+end.time <- Sys.time()
+time.taken_2 <- round(end.time - start.time,2)
+
+# wypisanie parametrow czasu i pamieci
+
+cat('czas otwarcia pliku csv:', time.taken, 'rozmiar pliku csv w pamieci:', format(object.size(organisations), units='auto'))
+
+cat('czas otwarcia pliku csv:', time.taken_1, 'rozmiar pliku csv w pamieci:', format(object.size(dataset), units='auto'))
+
+cat('czas otwarcia pliku parquet:', time.taken_2, 'rozmiar pliku parqet w pamieci', format(object.size(dataset_2), units='auto'))
+
+# porownaniezajmowanej pamieci na dysku
+
+  # Jezeli chodzi o porownanie miejsca na dysku obu formatow tego samego pliku, tutaj zdecydowanie mniej zajmuje parquet - 135 MB
+
+  # Standardowy plik csv natomiast zajmuje az 269 MB
+
+
+# liczba wierszy pliku csv
+cat("liczba wierszy pliku csv:", nrow(dataset))
+```
+
+8.  Korzystając z pipe operator oblicz sumę danych z kolumny *Number_of_employees* dla każdego z 3 sposobów wczytywania danych. W przypadku plików otwartych z wykorzystaniem pakietu arrow najpierw należy wczytać dane: ... *select(col_name) %\>% collect() %\>% ...*
+9.  Zmierz czas wykonania tych obliczeń
+
+```{r arrow_2}
+
+
+number_of_employees_2 <- dataset_2 |> select(Number_of_employees) |> collect() |>
+  summarise(number_of_employees = sum(Number_of_employees))
+# sumowanie kolumny  z pliku csv wczytanego read.csv
+start.time <- Sys.time()
+
+number_of_employees <- organisations |>
+  summarise(number_of_employees = sum(Number_of_employees))
+
+end.time <- Sys.time()
+time.taken <- round(end.time - start.time,2)
+
+# sumowanie kolumny  z pliku csv wczytanego open_dataset
+start.time <- Sys.time()
+
+number_of_employees_1 <- dataset |>
+  summarise(number_of_employees = sum(Number_of_employees))
+
+end.time <- Sys.time()
+time.taken_1 <- round(end.time - start.time,2)
+
+# sumowanie kolumny  z pliku parquet wczytanego open_dataset
+start.time <- Sys.time()
+
+number_of_employees_2 <- dataset_2 |> select(Number_of_employees) |> collect() |>
+  summarise(number_of_employees = sum(Number_of_employees))
+
+end.time <- Sys.time()
+time.taken_2 <- round(end.time - start.time,2)
+
+#suma pracownikow
+number_of_employees
+
+# wypisanie czasu sumowania kolumny dla poszczegolnych przypadkow
+cat('czas sumowania kolumny  z pliku csv wczytanego read.csv', time.taken)
+
+cat('czas sumowania kolumny  z pliku csv wczytanego open_dataset', time.taken_1)
+
+cat('czas sumowania kolumny z pliku parquet wczytanego open_dataset', time.taken_2)
+
+
+
+```
+
+
+
+
+### Materiały dodatkowe:
+
+Przykład wykorzystania Apache arrow do obsługi danych ważących 70GB: <https://arrow-user2022.netlify.app>
+
+<https://arrow.apache.org>
+
+<https://global.oup.com/us/companion.websites/9780190616397/resources/spss/>

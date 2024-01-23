@@ -1,0 +1,55 @@
+---
+title: "Zadanie 2. Wyświetlanie data frame"
+author: "Gabriel Szewczyk"
+format: 
+  html:
+    code-fold: true
+    code-tools: true
+    fontsize: 18pt
+editor: visual
+---
+
+# Zadanie: 
+Stworzyć nowy dokument, w którym utworzyć data frame jak na poprzednich zajęciach i wyświetlić go automatycznie w postaci tabeli markdowna.
+
+```{r, out.width="70%"}
+#| column: screen
+
+library(ggplot2)
+# Test 1 Wyniki testów Matematyki dla Grupy A i Grupy B
+wyniki_grupa_a_1 <- c(60, 65, 75, 68, 62)
+wyniki_grupa_b_1 <- c(78, 80, 85, 92, 88)
+
+# Test 2 Wyniki testów Matematyki dla Grupy A i Grupy B
+wyniki_grupa_a_2 <- c(80, 65, 75, 68, 72)
+wyniki_grupa_b_2 <- c(78, 80, 85, 92, 88)
+
+srednia_a1 <- c(mean(wyniki_grupa_a_1))
+srednia_a2 <- c(mean(wyniki_grupa_a_2))
+srednia_b1 <- c(mean(wyniki_grupa_b_1))
+srednia_b2 <- c(mean(wyniki_grupa_b_2))
+srednie <- c(srednia_a1, srednia_a2, srednia_b1, srednia_b2)
+srednie_do_wykresu <- c()
+for (sr in srednie) {
+  if (sr >= 70) {
+    srednie_do_wykresu <- append(srednie_do_wykresu, sr)
+  }
+}
+
+dane__ <- data.frame(
+  Nrtestu_Grupa = c("2_A", "1_B",
+                    "2_B"),
+  Średnia = srednie_do_wykresu
+)
+print(dane__)
+wykres_testow <- ggplot(dane__, aes(x = Nrtestu_Grupa, y = Średnia)) +
+  geom_bar(stat = "identity", fill = "#1925cf") +
+  labs(title = "Średnie wyniki testów dla danej grupy",
+       x = "Nr testu _ Grupa",
+       y = "Średnia") +
+  theme(plot.title = element_text(size = 22, face = "bold"),
+        axis.text = element_text(size = 16),
+        axis.title = element_text(size = 18, face = "bold"))
+print(wykres_testow)
+```
+

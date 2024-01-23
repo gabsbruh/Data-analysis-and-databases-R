@@ -1,0 +1,4599 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Szewczyk">
+
+<title>Zadanie 4. Przykładowe tabele obrazujące łączenie</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="LAB04_files/libs/clipboard/clipboard.min.js"></script>
+<script src="LAB04_files/libs/quarto-html/quarto.js"></script>
+<script src="LAB04_files/libs/quarto-html/popper.min.js"></script>
+<script src="LAB04_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="LAB04_files/libs/quarto-html/anchor.min.js"></script>
+<link href="LAB04_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="LAB04_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="LAB04_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="LAB04_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="LAB04_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full">
+
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Zadanie 4. Przykładowe tabele obrazujące łączenie</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Gabriel Szewczyk </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="bilbioteki-i-konfiguracja-połączenia-z-bazą" class="level1">
+<h1>Bilbioteki i konfiguracja połączenia z bazą</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dsn_database <span class="ot">=</span> <span class="st">"wbauer_adb_2023"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>dsn_hostname <span class="ot">=</span> <span class="st">"pgsql-196447.vipserv.org"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>dsn_port <span class="ot">=</span> <span class="st">"5432"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dsn_uid <span class="ot">=</span> <span class="st">"wbauer_adb"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dsn_pwd <span class="ot">=</span> <span class="st">"adb2020"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(), <span class="at">dbname =</span> dsn_database, <span class="at">host=</span>dsn_hostname, <span class="at">port=</span>dsn_port, <span class="at">user=</span>dsn_uid, <span class="at">password=</span>dsn_pwd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="znajdź-listę-wszystkich-filmów-o-tej-samej-długości." class="level1">
+<h1>1. Znajdź listę wszystkich filmów o tej samej długości.</h1>
+<p>Podaję długość, i otrzymuję listę filmów</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>length <span class="ot">=</span> <span class="dv">47</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>same_length <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(<span class="st">"SELECT title, length FROM film WHERE length = %f"</span>, length))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>same_length</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">title</th>
+<th style="text-align: right;">length</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Divorce Shining</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Downhill Enough</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Halloween Nuts</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hanover Galaxy</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hawk Chill</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shanghai Tycoon</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Suspects Quills</td>
+<td style="text-align: right;">47</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="znajdź-wszystkich-klientów-mieszkających-w-tym-samym-mieście." class="level1">
+<h1>2. Znajdź wszystkich klientów mieszkających w tym samym mieście.</h1>
+<p>Wybrane zostało miasto Londyn, poniżej zaprezentowano wyniki.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>client_from_city<span class="ot">&lt;-</span> <span class="cf">function</span>(city){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(city)) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    city_customers_list <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>     <span class="st">"SELECT ct.city, c.first_name, c.last_name</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">      FROM customer AS c</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">      INNER JOIN address a ON c.address_id = a.address_id</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">      INNER JOIN city ct ON a.city_id = ct.city_id </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="st">      WHERE city = '%s'</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">      ORDER BY c.first_name, c.last_name"</span>, city))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(city_customers_list)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Osoby mieszkające w Londynie:"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Osoby mieszkające w Londynie:"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">client_from_city</span>(<span class="st">'London'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">city</th>
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">last_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">London</td>
+<td style="text-align: left;">Cecil</td>
+<td style="text-align: left;">Vines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">London</td>
+<td style="text-align: left;">Mattie</td>
+<td style="text-align: left;">Hoffman</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="oblicz-średni-koszt-wypożyczenia-wszystkich-filmów." class="level1">
+<h1>3. Oblicz średni koszt wypożyczenia wszystkich filmów.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>avg_price <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT AVG(p.amount) as avg</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM payment as p</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN rental r ON p.rental_id = r.rental_id</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN inventory i ON r.inventory_id = i.inventory_id</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON i.film_id = f.film_id</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY f.film_id"</span>))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Średni koszt wypożyczenia wszystkich filmów to %.2f"</span>, avg_price[<span class="dv">1</span>,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Średni koszt wypożyczenia wszystkich filmów to 2.85"</code></pre>
+</div>
+</div>
+</section>
+<section id="oblicz-i-wyświetl-liczbę-filmów-we-wszystkich-kategoriach." class="level1">
+<h1>4. Oblicz i wyświetl liczbę filmów we wszystkich kategoriach.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>category_of_film <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, COUNT(fcat.film_id) AS count</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM category AS cat </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">  GROUP BY cat.name"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>category_of_film</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">category</th>
+<th style="text-align: right;">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Family</td>
+<td style="text-align: right;">69</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Games</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Animation</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Classics</td>
+<td style="text-align: right;">57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Documentary</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">New</td>
+<td style="text-align: right;">63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sports</td>
+<td style="text-align: right;">74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Children</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Music</td>
+<td style="text-align: right;">51</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Travel</td>
+<td style="text-align: right;">57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Foreign</td>
+<td style="text-align: right;">73</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Drama</td>
+<td style="text-align: right;">62</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Horror</td>
+<td style="text-align: right;">56</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Action</td>
+<td style="text-align: right;">64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sci-Fi</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Comedy</td>
+<td style="text-align: right;">58</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="wyświetl-liczbę-wszystkich-klientów-pogrupowanych-według-kraju." class="level1">
+<h1>5. Wyświetl liczbę wszystkich klientów pogrupowanych według kraju.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>clients_by_country <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT ctr.country AS country, COUNT(c.customer_id)AS count</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">   FROM customer AS c</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN address a ON c.address_id = a.address_id</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN city ct ON a.city_id = ct.city_id</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN country ctr ON ct.country_id = ctr.country_id</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">   GROUP BY ctr.country</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">   ORDER BY ctr.country"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>clients_by_country</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Afghanistan</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Algeria</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">American Samoa</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Angola</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Anguilla</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Argentina</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Armenia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Austria</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Azerbaijan</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bahrain</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bangladesh</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Belarus</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bolivia</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brazil</td>
+<td style="text-align: right;">28</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brunei</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bulgaria</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cambodia</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cameroon</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Chad</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Chile</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">China</td>
+<td style="text-align: right;">53</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Colombia</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Congo, The Democratic Republic of the</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Czech Republic</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dominican Republic</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ecuador</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Egypt</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Estonia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ethiopia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Faroe Islands</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Finland</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">France</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">French Guiana</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">French Polynesia</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gambia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Germany</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Greece</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Greenland</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Holy See (Vatican City State)</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hong Kong</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hungary</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">India</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Indonesia</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Iran</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Iraq</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Israel</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Italy</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Japan</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kazakstan</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kenya</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kuwait</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Latvia</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Liechtenstein</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lithuania</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Madagascar</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Malawi</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Malaysia</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mexico</td>
+<td style="text-align: right;">30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Moldova</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Morocco</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mozambique</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Myanmar</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nauru</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nepal</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Netherlands</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">New Zealand</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nigeria</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">North Korea</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Oman</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pakistan</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paraguay</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Peru</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Philippines</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Poland</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Puerto Rico</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Romania</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Runion</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Russian Federation</td>
+<td style="text-align: right;">28</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Saint Vincent and the Grenadines</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Saudi Arabia</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Senegal</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Slovakia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">South Africa</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">South Korea</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spain</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sri Lanka</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sudan</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sweden</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Switzerland</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Taiwan</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tanzania</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Thailand</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tonga</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tunisia</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Turkey</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Turkmenistan</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tuvalu</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ukraine</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United Arab Emirates</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">United Kingdom</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">United States</td>
+<td style="text-align: right;">36</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Venezuela</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Vietnam</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Virgin Islands, U.S.</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yemen</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yugoslavia</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Zambia</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="wyświetl-informacje-o-sklepie-który-ma-więcej-niż-100-klientów-i-mniej-niż-300-klientów." class="level1">
+<h1>6. Wyświetl informacje o sklepie, który ma więcej niż 100 klientów i mniej niż 300 klientów.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>shop_with_100_300_customers <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,<span class="st">"SELECT a.address, ct.city, COUNT(c.customer_id) AS clients </span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st"> FROM store AS st</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN address a ON st.address_id = a.address_id</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN customer c ON st.store_id = c.store_id</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN city ct ON a.city_id = ct.city_id</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st"> GROUP BY a.address, ct.city</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st"> HAVING COUNT(c.customer_id) BETWEEN 100 AND 300"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>shop_with_100_300_customers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">address</th>
+<th style="text-align: left;">city</th>
+<th style="text-align: right;">clients</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">28 MySQL Boulevard</td>
+<td style="text-align: left;">Woodridge</td>
+<td style="text-align: right;">273</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="wybierz-wszystkich-klientów-którzy-oglądali-filmy-ponad-200-godzin." class="level1">
+<h1>7. Wybierz wszystkich klientów, którzy oglądali filmy ponad 200 godzin.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>client_by_sum_length <span class="ot">&lt;-</span> <span class="cf">function</span>(sum_min){</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.integer</span>(sum_min) <span class="sc">||</span> <span class="fu">is.double</span>(sum_min)) {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    sum_film_length <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"SELECT c.first_name, c.last_name, SUM(f.length) AS sum</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="st">       FROM customer as c</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN rental r ON c.customer_id = r.customer_id</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN inventory i ON r.inventory_id = i.inventory_id</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN film f ON i.film_id = f.film_id</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="st">       GROUP BY c.first_name, c.last_name</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="st">       HAVING SUM(f.length) &gt;= %f</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="st">       ORDER BY sum, c.last_name, c.first_name"</span>, sum_min))</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(sum_film_length)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">client_by_sum_length</span>(<span class="dv">1200</span>) <span class="co"># input 1200 bo 200h * 60 min to 1200</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">first_name</th>
+<th style="text-align: left;">last_name</th>
+<th style="text-align: right;">sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Brian</td>
+<td style="text-align: left;">Wyman</td>
+<td style="text-align: right;">1265</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Antonio</td>
+<td style="text-align: left;">Meek</td>
+<td style="text-align: right;">1451</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leona</td>
+<td style="text-align: left;">Obrien</td>
+<td style="text-align: right;">1588</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Katherine</td>
+<td style="text-align: left;">Rivera</td>
+<td style="text-align: right;">1615</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tiffany</td>
+<td style="text-align: left;">Jordan</td>
+<td style="text-align: right;">1667</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jerome</td>
+<td style="text-align: left;">Kenyon</td>
+<td style="text-align: right;">1679</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Penny</td>
+<td style="text-align: left;">Neal</td>
+<td style="text-align: right;">1738</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lonnie</td>
+<td style="text-align: left;">Tirado</td>
+<td style="text-align: right;">1834</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dwight</td>
+<td style="text-align: left;">Lombardi</td>
+<td style="text-align: right;">1846</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Johnny</td>
+<td style="text-align: left;">Turpin</td>
+<td style="text-align: right;">1846</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Caroline</td>
+<td style="text-align: left;">Bowman</td>
+<td style="text-align: right;">1847</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Allan</td>
+<td style="text-align: left;">Cornish</td>
+<td style="text-align: right;">1916</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lewis</td>
+<td style="text-align: left;">Lyman</td>
+<td style="text-align: right;">1933</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lester</td>
+<td style="text-align: left;">Kraus</td>
+<td style="text-align: right;">1943</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eva</td>
+<td style="text-align: left;">Ramos</td>
+<td style="text-align: right;">1945</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Austin</td>
+<td style="text-align: left;">Cintron</td>
+<td style="text-align: right;">1961</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Joann</td>
+<td style="text-align: left;">Gardner</td>
+<td style="text-align: right;">1963</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Annie</td>
+<td style="text-align: left;">Russell</td>
+<td style="text-align: right;">1965</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jonathan</td>
+<td style="text-align: left;">Scarborough</td>
+<td style="text-align: right;">1984</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Anita</td>
+<td style="text-align: left;">Morales</td>
+<td style="text-align: right;">1999</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eileen</td>
+<td style="text-align: left;">Carr</td>
+<td style="text-align: right;">2031</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kenneth</td>
+<td style="text-align: left;">Gooden</td>
+<td style="text-align: right;">2033</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wayne</td>
+<td style="text-align: left;">Truong</td>
+<td style="text-align: right;">2044</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Floyd</td>
+<td style="text-align: left;">Gandy</td>
+<td style="text-align: right;">2063</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Paula</td>
+<td style="text-align: left;">Bryant</td>
+<td style="text-align: right;">2084</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nellie</td>
+<td style="text-align: left;">Garrett</td>
+<td style="text-align: right;">2098</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vanessa</td>
+<td style="text-align: left;">Sims</td>
+<td style="text-align: right;">2103</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jo</td>
+<td style="text-align: left;">Fowler</td>
+<td style="text-align: right;">2107</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ruben</td>
+<td style="text-align: left;">Geary</td>
+<td style="text-align: right;">2107</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Oscar</td>
+<td style="text-align: left;">Aquino</td>
+<td style="text-align: right;">2119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nelson</td>
+<td style="text-align: left;">Christenson</td>
+<td style="text-align: right;">2119</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Irma</td>
+<td style="text-align: left;">Pearson</td>
+<td style="text-align: right;">2128</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kristen</td>
+<td style="text-align: left;">Chavez</td>
+<td style="text-align: right;">2130</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kay</td>
+<td style="text-align: left;">Caldwell</td>
+<td style="text-align: right;">2133</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Armando</td>
+<td style="text-align: left;">Gruber</td>
+<td style="text-align: right;">2142</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sheila</td>
+<td style="text-align: left;">Wells</td>
+<td style="text-align: right;">2148</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eugene</td>
+<td style="text-align: left;">Culpepper</td>
+<td style="text-align: right;">2158</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Christina</td>
+<td style="text-align: left;">Ramirez</td>
+<td style="text-align: right;">2178</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jeanette</td>
+<td style="text-align: left;">Greene</td>
+<td style="text-align: right;">2197</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ann</td>
+<td style="text-align: left;">Evans</td>
+<td style="text-align: right;">2202</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rose</td>
+<td style="text-align: left;">Howard</td>
+<td style="text-align: right;">2208</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Edith</td>
+<td style="text-align: left;">Mcdonald</td>
+<td style="text-align: right;">2210</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Raul</td>
+<td style="text-align: left;">Fortier</td>
+<td style="text-align: right;">2212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lloyd</td>
+<td style="text-align: left;">Dowd</td>
+<td style="text-align: right;">2231</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kim</td>
+<td style="text-align: left;">Cruz</td>
+<td style="text-align: right;">2236</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bonnie</td>
+<td style="text-align: left;">Hughes</td>
+<td style="text-align: right;">2241</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Julio</td>
+<td style="text-align: left;">Noland</td>
+<td style="text-align: right;">2258</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kirk</td>
+<td style="text-align: left;">Stclair</td>
+<td style="text-align: right;">2258</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vernon</td>
+<td style="text-align: left;">Chapa</td>
+<td style="text-align: right;">2270</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nicole</td>
+<td style="text-align: left;">Peterson</td>
+<td style="text-align: right;">2271</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Norma</td>
+<td style="text-align: left;">Gonzales</td>
+<td style="text-align: right;">2272</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Vera</td>
+<td style="text-align: left;">Mccoy</td>
+<td style="text-align: right;">2275</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Melinda</td>
+<td style="text-align: left;">Fernandez</td>
+<td style="text-align: right;">2281</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Willard</td>
+<td style="text-align: left;">Lumpkin</td>
+<td style="text-align: right;">2285</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Samuel</td>
+<td style="text-align: left;">Marlow</td>
+<td style="text-align: right;">2291</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leslie</td>
+<td style="text-align: left;">Gordon</td>
+<td style="text-align: right;">2296</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jill</td>
+<td style="text-align: left;">Hawkins</td>
+<td style="text-align: right;">2313</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jared</td>
+<td style="text-align: left;">Ely</td>
+<td style="text-align: right;">2314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Frances</td>
+<td style="text-align: left;">Parker</td>
+<td style="text-align: right;">2317</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Henry</td>
+<td style="text-align: left;">Billingsley</td>
+<td style="text-align: right;">2325</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Allen</td>
+<td style="text-align: left;">Butterfield</td>
+<td style="text-align: right;">2329</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Timothy</td>
+<td style="text-align: left;">Bunn</td>
+<td style="text-align: right;">2334</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alfredo</td>
+<td style="text-align: left;">Mcadams</td>
+<td style="text-align: right;">2357</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Corey</td>
+<td style="text-align: left;">Hauser</td>
+<td style="text-align: right;">2358</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Franklin</td>
+<td style="text-align: left;">Troutman</td>
+<td style="text-align: right;">2366</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Frederick</td>
+<td style="text-align: left;">Isbell</td>
+<td style="text-align: right;">2367</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sean</td>
+<td style="text-align: left;">Douglass</td>
+<td style="text-align: right;">2376</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Daniel</td>
+<td style="text-align: left;">Cabral</td>
+<td style="text-align: right;">2380</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Luis</td>
+<td style="text-align: left;">Yanez</td>
+<td style="text-align: right;">2380</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Laura</td>
+<td style="text-align: left;">Rodriguez</td>
+<td style="text-align: right;">2384</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lorraine</td>
+<td style="text-align: left;">Stephens</td>
+<td style="text-align: right;">2388</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kelly</td>
+<td style="text-align: left;">Torres</td>
+<td style="text-align: right;">2397</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tyler</td>
+<td style="text-align: left;">Wren</td>
+<td style="text-align: right;">2404</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Delores</td>
+<td style="text-align: left;">Hansen</td>
+<td style="text-align: right;">2413</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Roberta</td>
+<td style="text-align: left;">Harper</td>
+<td style="text-align: right;">2417</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Francisco</td>
+<td style="text-align: left;">Skidmore</td>
+<td style="text-align: right;">2417</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Carol</td>
+<td style="text-align: left;">Garcia</td>
+<td style="text-align: right;">2425</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tony</td>
+<td style="text-align: left;">Carranza</td>
+<td style="text-align: right;">2437</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Adam</td>
+<td style="text-align: left;">Gooch</td>
+<td style="text-align: right;">2437</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Joel</td>
+<td style="text-align: left;">Francisco</td>
+<td style="text-align: right;">2440</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pamela</td>
+<td style="text-align: left;">Baker</td>
+<td style="text-align: right;">2455</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lauren</td>
+<td style="text-align: left;">Hudson</td>
+<td style="text-align: right;">2462</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Terry</td>
+<td style="text-align: left;">Grissom</td>
+<td style="text-align: right;">2464</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Chad</td>
+<td style="text-align: left;">Carbone</td>
+<td style="text-align: right;">2473</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Toni</td>
+<td style="text-align: left;">Holt</td>
+<td style="text-align: right;">2474</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Chris</td>
+<td style="text-align: left;">Brothers</td>
+<td style="text-align: right;">2475</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rafael</td>
+<td style="text-align: left;">Abney</td>
+<td style="text-align: right;">2477</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darryl</td>
+<td style="text-align: left;">Ashcraft</td>
+<td style="text-align: right;">2477</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Irene</td>
+<td style="text-align: left;">Price</td>
+<td style="text-align: right;">2480</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Adrian</td>
+<td style="text-align: left;">Clary</td>
+<td style="text-align: right;">2483</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jacob</td>
+<td style="text-align: left;">Lance</td>
+<td style="text-align: right;">2483</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Andrea</td>
+<td style="text-align: left;">Henderson</td>
+<td style="text-align: right;">2487</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Anne</td>
+<td style="text-align: left;">Powell</td>
+<td style="text-align: right;">2490</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Juan</td>
+<td style="text-align: left;">Fraley</td>
+<td style="text-align: right;">2495</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Derrick</td>
+<td style="text-align: left;">Bourque</td>
+<td style="text-align: right;">2497</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jesus</td>
+<td style="text-align: left;">Mccartney</td>
+<td style="text-align: right;">2500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Anthony</td>
+<td style="text-align: left;">Schwab</td>
+<td style="text-align: right;">2503</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Robert</td>
+<td style="text-align: left;">Baughman</td>
+<td style="text-align: right;">2504</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yvonne</td>
+<td style="text-align: left;">Watkins</td>
+<td style="text-align: right;">2513</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alicia</td>
+<td style="text-align: left;">Mills</td>
+<td style="text-align: right;">2518</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Carlos</td>
+<td style="text-align: left;">Coughlin</td>
+<td style="text-align: right;">2522</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Anna</td>
+<td style="text-align: left;">Hill</td>
+<td style="text-align: right;">2522</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Herbert</td>
+<td style="text-align: left;">Kruger</td>
+<td style="text-align: right;">2534</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Donald</td>
+<td style="text-align: left;">Mahon</td>
+<td style="text-align: right;">2538</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hugh</td>
+<td style="text-align: left;">Waldrop</td>
+<td style="text-align: right;">2540</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rachel</td>
+<td style="text-align: left;">Barnes</td>
+<td style="text-align: right;">2543</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Francis</td>
+<td style="text-align: left;">Sikes</td>
+<td style="text-align: right;">2547</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Randall</td>
+<td style="text-align: left;">Neumann</td>
+<td style="text-align: right;">2552</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kevin</td>
+<td style="text-align: left;">Schuler</td>
+<td style="text-align: right;">2552</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jon</td>
+<td style="text-align: left;">Wiles</td>
+<td style="text-align: right;">2552</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sam</td>
+<td style="text-align: left;">Mcduffie</td>
+<td style="text-align: right;">2576</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mattie</td>
+<td style="text-align: left;">Hoffman</td>
+<td style="text-align: right;">2580</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Barbara</td>
+<td style="text-align: left;">Jones</td>
+<td style="text-align: right;">2580</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Judy</td>
+<td style="text-align: left;">Gray</td>
+<td style="text-align: right;">2581</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Peggy</td>
+<td style="text-align: left;">Myers</td>
+<td style="text-align: right;">2590</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Harvey</td>
+<td style="text-align: left;">Guajardo</td>
+<td style="text-align: right;">2593</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lance</td>
+<td style="text-align: left;">Pemberton</td>
+<td style="text-align: right;">2593</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beverly</td>
+<td style="text-align: left;">Brooks</td>
+<td style="text-align: right;">2607</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Peter</td>
+<td style="text-align: left;">Menard</td>
+<td style="text-align: right;">2609</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cecil</td>
+<td style="text-align: left;">Vines</td>
+<td style="text-align: right;">2614</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Marshall</td>
+<td style="text-align: left;">Thorn</td>
+<td style="text-align: right;">2616</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Danny</td>
+<td style="text-align: left;">Isom</td>
+<td style="text-align: right;">2619</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Laurie</td>
+<td style="text-align: left;">Lawrence</td>
+<td style="text-align: right;">2619</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stella</td>
+<td style="text-align: left;">Moreno</td>
+<td style="text-align: right;">2632</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tara</td>
+<td style="text-align: left;">Ryan</td>
+<td style="text-align: right;">2634</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fred</td>
+<td style="text-align: left;">Wheat</td>
+<td style="text-align: right;">2634</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brent</td>
+<td style="text-align: left;">Harkins</td>
+<td style="text-align: right;">2639</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Albert</td>
+<td style="text-align: left;">Crouse</td>
+<td style="text-align: right;">2641</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wilma</td>
+<td style="text-align: left;">Richards</td>
+<td style="text-align: right;">2641</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Christine</td>
+<td style="text-align: left;">Roberts</td>
+<td style="text-align: right;">2641</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pearl</td>
+<td style="text-align: left;">Garza</td>
+<td style="text-align: right;">2642</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rene</td>
+<td style="text-align: left;">Mcalister</td>
+<td style="text-align: right;">2643</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Carl</td>
+<td style="text-align: left;">Artis</td>
+<td style="text-align: right;">2644</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Melanie</td>
+<td style="text-align: left;">Armstrong</td>
+<td style="text-align: right;">2645</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Chester</td>
+<td style="text-align: left;">Benner</td>
+<td style="text-align: right;">2646</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shane</td>
+<td style="text-align: left;">Millard</td>
+<td style="text-align: right;">2649</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vivian</td>
+<td style="text-align: left;">Ruiz</td>
+<td style="text-align: right;">2649</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jose</td>
+<td style="text-align: left;">Andrew</td>
+<td style="text-align: right;">2654</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Marie</td>
+<td style="text-align: left;">Turner</td>
+<td style="text-align: right;">2656</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Phyllis</td>
+<td style="text-align: left;">Foster</td>
+<td style="text-align: right;">2658</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lillie</td>
+<td style="text-align: left;">Kim</td>
+<td style="text-align: right;">2658</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bertha</td>
+<td style="text-align: left;">Ferguson</td>
+<td style="text-align: right;">2663</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alfred</td>
+<td style="text-align: left;">Casillas</td>
+<td style="text-align: right;">2665</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Colleen</td>
+<td style="text-align: left;">Burton</td>
+<td style="text-align: right;">2668</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ruth</td>
+<td style="text-align: left;">Martinez</td>
+<td style="text-align: right;">2669</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kurt</td>
+<td style="text-align: left;">Emmons</td>
+<td style="text-align: right;">2672</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Miriam</td>
+<td style="text-align: left;">Mckinney</td>
+<td style="text-align: right;">2672</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mathew</td>
+<td style="text-align: left;">Bolin</td>
+<td style="text-align: right;">2673</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jeremy</td>
+<td style="text-align: left;">Hurtado</td>
+<td style="text-align: right;">2673</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Andy</td>
+<td style="text-align: left;">Vanhorn</td>
+<td style="text-align: right;">2675</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dolores</td>
+<td style="text-align: left;">Wagner</td>
+<td style="text-align: right;">2677</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shannon</td>
+<td style="text-align: left;">Freeman</td>
+<td style="text-align: right;">2678</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jeffrey</td>
+<td style="text-align: left;">Spear</td>
+<td style="text-align: right;">2678</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Margaret</td>
+<td style="text-align: left;">Moore</td>
+<td style="text-align: right;">2680</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Maureen</td>
+<td style="text-align: left;">Little</td>
+<td style="text-align: right;">2681</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Josephine</td>
+<td style="text-align: left;">Gomez</td>
+<td style="text-align: right;">2682</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rodney</td>
+<td style="text-align: left;">Moeller</td>
+<td style="text-align: right;">2682</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Vincent</td>
+<td style="text-align: left;">Ralston</td>
+<td style="text-align: right;">2684</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Victoria</td>
+<td style="text-align: left;">Gibson</td>
+<td style="text-align: right;">2685</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Martin</td>
+<td style="text-align: left;">Bales</td>
+<td style="text-align: right;">2689</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Freddie</td>
+<td style="text-align: left;">Duggan</td>
+<td style="text-align: right;">2689</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Aaron</td>
+<td style="text-align: left;">Selby</td>
+<td style="text-align: right;">2691</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Travis</td>
+<td style="text-align: left;">Estep</td>
+<td style="text-align: right;">2694</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Roland</td>
+<td style="text-align: left;">South</td>
+<td style="text-align: right;">2695</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Emily</td>
+<td style="text-align: left;">Diaz</td>
+<td style="text-align: right;">2699</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kathryn</td>
+<td style="text-align: left;">Coleman</td>
+<td style="text-align: right;">2701</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lydia</td>
+<td style="text-align: left;">Burke</td>
+<td style="text-align: right;">2703</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Norman</td>
+<td style="text-align: left;">Currier</td>
+<td style="text-align: right;">2706</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Donna</td>
+<td style="text-align: left;">Thompson</td>
+<td style="text-align: right;">2710</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cody</td>
+<td style="text-align: left;">Nolen</td>
+<td style="text-align: right;">2711</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Natalie</td>
+<td style="text-align: left;">Meyer</td>
+<td style="text-align: right;">2712</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bob</td>
+<td style="text-align: left;">Pfeiffer</td>
+<td style="text-align: right;">2719</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leo</td>
+<td style="text-align: left;">Ebert</td>
+<td style="text-align: right;">2725</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Erica</td>
+<td style="text-align: left;">Matthews</td>
+<td style="text-align: right;">2727</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Velma</td>
+<td style="text-align: left;">Lucas</td>
+<td style="text-align: right;">2729</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Calvin</td>
+<td style="text-align: left;">Martel</td>
+<td style="text-align: right;">2730</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Thomas</td>
+<td style="text-align: left;">Grigsby</td>
+<td style="text-align: right;">2731</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Megan</td>
+<td style="text-align: left;">Palmer</td>
+<td style="text-align: right;">2732</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Agnes</td>
+<td style="text-align: left;">Bishop</td>
+<td style="text-align: right;">2741</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charlene</td>
+<td style="text-align: left;">Alvarez</td>
+<td style="text-align: right;">2743</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Howard</td>
+<td style="text-align: left;">Fortner</td>
+<td style="text-align: right;">2744</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ronnie</td>
+<td style="text-align: left;">Ricketts</td>
+<td style="text-align: right;">2748</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pedro</td>
+<td style="text-align: left;">Chestnut</td>
+<td style="text-align: right;">2750</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dan</td>
+<td style="text-align: left;">Paine</td>
+<td style="text-align: right;">2750</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Suzanne</td>
+<td style="text-align: left;">Nichols</td>
+<td style="text-align: right;">2751</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kelly</td>
+<td style="text-align: left;">Knott</td>
+<td style="text-align: right;">2753</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Marian</td>
+<td style="text-align: left;">Mendoza</td>
+<td style="text-align: right;">2753</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Doris</td>
+<td style="text-align: left;">Reed</td>
+<td style="text-align: right;">2756</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Annette</td>
+<td style="text-align: left;">Olson</td>
+<td style="text-align: right;">2759</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bernard</td>
+<td style="text-align: left;">Colby</td>
+<td style="text-align: right;">2760</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Emma</td>
+<td style="text-align: left;">Boyd</td>
+<td style="text-align: right;">2767</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bobbie</td>
+<td style="text-align: left;">Craig</td>
+<td style="text-align: right;">2767</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Darren</td>
+<td style="text-align: left;">Windham</td>
+<td style="text-align: right;">2778</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alberto</td>
+<td style="text-align: left;">Henning</td>
+<td style="text-align: right;">2779</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dwayne</td>
+<td style="text-align: left;">Olvera</td>
+<td style="text-align: right;">2782</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brandy</td>
+<td style="text-align: left;">Graves</td>
+<td style="text-align: right;">2785</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jack</td>
+<td style="text-align: left;">Foust</td>
+<td style="text-align: right;">2790</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Felix</td>
+<td style="text-align: left;">Gaffney</td>
+<td style="text-align: right;">2791</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ray</td>
+<td style="text-align: left;">Houle</td>
+<td style="text-align: right;">2791</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Carla</td>
+<td style="text-align: left;">Gutierrez</td>
+<td style="text-align: right;">2793</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Deanna</td>
+<td style="text-align: left;">Byrd</td>
+<td style="text-align: right;">2795</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Connie</td>
+<td style="text-align: left;">Wallace</td>
+<td style="text-align: right;">2795</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wade</td>
+<td style="text-align: left;">Delvalle</td>
+<td style="text-align: right;">2804</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Loretta</td>
+<td style="text-align: left;">Carpenter</td>
+<td style="text-align: right;">2807</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Robin</td>
+<td style="text-align: left;">Hayes</td>
+<td style="text-align: right;">2807</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bruce</td>
+<td style="text-align: left;">Schwarz</td>
+<td style="text-align: right;">2813</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dorothy</td>
+<td style="text-align: left;">Taylor</td>
+<td style="text-align: right;">2813</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ricardo</td>
+<td style="text-align: left;">Meador</td>
+<td style="text-align: right;">2818</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gregory</td>
+<td style="text-align: left;">Mauldin</td>
+<td style="text-align: right;">2822</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charlotte</td>
+<td style="text-align: left;">Hunter</td>
+<td style="text-align: right;">2828</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Elmer</td>
+<td style="text-align: left;">Noe</td>
+<td style="text-align: right;">2828</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jesse</td>
+<td style="text-align: left;">Schilling</td>
+<td style="text-align: right;">2830</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Christian</td>
+<td style="text-align: left;">Jung</td>
+<td style="text-align: right;">2831</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tyrone</td>
+<td style="text-align: left;">Asher</td>
+<td style="text-align: right;">2833</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Johnnie</td>
+<td style="text-align: left;">Chisholm</td>
+<td style="text-align: right;">2835</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clinton</td>
+<td style="text-align: left;">Buford</td>
+<td style="text-align: right;">2839</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Paul</td>
+<td style="text-align: left;">Trout</td>
+<td style="text-align: right;">2842</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Edna</td>
+<td style="text-align: left;">West</td>
+<td style="text-align: right;">2847</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Edwin</td>
+<td style="text-align: left;">Burk</td>
+<td style="text-align: right;">2849</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Joan</td>
+<td style="text-align: left;">Cooper</td>
+<td style="text-align: right;">2850</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Myrtle</td>
+<td style="text-align: left;">Fleming</td>
+<td style="text-align: right;">2852</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dora</td>
+<td style="text-align: left;">Medina</td>
+<td style="text-align: right;">2852</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Micheal</td>
+<td style="text-align: left;">Forman</td>
+<td style="text-align: right;">2853</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marlene</td>
+<td style="text-align: left;">Welch</td>
+<td style="text-align: right;">2854</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jenny</td>
+<td style="text-align: left;">Castro</td>
+<td style="text-align: right;">2855</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Billie</td>
+<td style="text-align: left;">Horton</td>
+<td style="text-align: right;">2855</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Claudia</td>
+<td style="text-align: left;">Fuller</td>
+<td style="text-align: right;">2856</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">William</td>
+<td style="text-align: left;">Satterfield</td>
+<td style="text-align: right;">2856</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pauline</td>
+<td style="text-align: left;">Henry</td>
+<td style="text-align: right;">2857</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sergio</td>
+<td style="text-align: left;">Stanfield</td>
+<td style="text-align: right;">2859</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jackie</td>
+<td style="text-align: left;">Lynch</td>
+<td style="text-align: right;">2863</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leon</td>
+<td style="text-align: left;">Bostic</td>
+<td style="text-align: right;">2864</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gary</td>
+<td style="text-align: left;">Coy</td>
+<td style="text-align: right;">2865</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Louise</td>
+<td style="text-align: left;">Jenkins</td>
+<td style="text-align: right;">2866</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Willie</td>
+<td style="text-align: left;">Howell</td>
+<td style="text-align: right;">2876</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Seth</td>
+<td style="text-align: left;">Hannon</td>
+<td style="text-align: right;">2877</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Max</td>
+<td style="text-align: left;">Pitt</td>
+<td style="text-align: right;">2877</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Earl</td>
+<td style="text-align: left;">Shanks</td>
+<td style="text-align: right;">2877</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">David</td>
+<td style="text-align: left;">Royal</td>
+<td style="text-align: right;">2879</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Keith</td>
+<td style="text-align: left;">Rico</td>
+<td style="text-align: right;">2880</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Larry</td>
+<td style="text-align: left;">Thrasher</td>
+<td style="text-align: right;">2881</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rebecca</td>
+<td style="text-align: left;">Scott</td>
+<td style="text-align: right;">2885</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Willie</td>
+<td style="text-align: left;">Markham</td>
+<td style="text-align: right;">2887</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gwendolyn</td>
+<td style="text-align: left;">May</td>
+<td style="text-align: right;">2890</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cory</td>
+<td style="text-align: left;">Meehan</td>
+<td style="text-align: right;">2894</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fernando</td>
+<td style="text-align: left;">Churchill</td>
+<td style="text-align: right;">2897</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Benjamin</td>
+<td style="text-align: left;">Varney</td>
+<td style="text-align: right;">2897</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glen</td>
+<td style="text-align: left;">Talbert</td>
+<td style="text-align: right;">2898</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lynn</td>
+<td style="text-align: left;">Payne</td>
+<td style="text-align: right;">2906</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tina</td>
+<td style="text-align: left;">Simmons</td>
+<td style="text-align: right;">2906</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jean</td>
+<td style="text-align: left;">Bell</td>
+<td style="text-align: right;">2907</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Scott</td>
+<td style="text-align: left;">Shelley</td>
+<td style="text-align: right;">2916</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Georgia</td>
+<td style="text-align: left;">Jacobs</td>
+<td style="text-align: right;">2922</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ernest</td>
+<td style="text-align: left;">Stepp</td>
+<td style="text-align: right;">2924</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nora</td>
+<td style="text-align: left;">Herrera</td>
+<td style="text-align: right;">2925</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jerry</td>
+<td style="text-align: left;">Jordon</td>
+<td style="text-align: right;">2925</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ida</td>
+<td style="text-align: left;">Andrews</td>
+<td style="text-align: right;">2927</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dennis</td>
+<td style="text-align: left;">Gilman</td>
+<td style="text-align: right;">2927</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rita</td>
+<td style="text-align: left;">Graham</td>
+<td style="text-align: right;">2929</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sidney</td>
+<td style="text-align: left;">Burleson</td>
+<td style="text-align: right;">2931</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dana</td>
+<td style="text-align: left;">Hart</td>
+<td style="text-align: right;">2931</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Don</td>
+<td style="text-align: left;">Bone</td>
+<td style="text-align: right;">2934</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leah</td>
+<td style="text-align: left;">Curtis</td>
+<td style="text-align: right;">2935</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marvin</td>
+<td style="text-align: left;">Yee</td>
+<td style="text-align: right;">2939</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Herman</td>
+<td style="text-align: left;">Devore</td>
+<td style="text-align: right;">2941</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yolanda</td>
+<td style="text-align: left;">Weaver</td>
+<td style="text-align: right;">2946</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Constance</td>
+<td style="text-align: left;">Reid</td>
+<td style="text-align: right;">2949</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Victor</td>
+<td style="text-align: left;">Barkley</td>
+<td style="text-align: right;">2950</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Milton</td>
+<td style="text-align: left;">Howland</td>
+<td style="text-align: right;">2951</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Julian</td>
+<td style="text-align: left;">Vest</td>
+<td style="text-align: right;">2955</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Katie</td>
+<td style="text-align: left;">Elliott</td>
+<td style="text-align: right;">2960</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lillian</td>
+<td style="text-align: left;">Griffin</td>
+<td style="text-align: right;">2960</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stacy</td>
+<td style="text-align: left;">Cunningham</td>
+<td style="text-align: right;">2963</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kimberly</td>
+<td style="text-align: left;">Lee</td>
+<td style="text-align: right;">2965</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vicki</td>
+<td style="text-align: left;">Fields</td>
+<td style="text-align: right;">2966</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charlie</td>
+<td style="text-align: left;">Bess</td>
+<td style="text-align: right;">2967</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wallace</td>
+<td style="text-align: left;">Slone</td>
+<td style="text-align: right;">2969</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Virgil</td>
+<td style="text-align: left;">Wofford</td>
+<td style="text-align: right;">2970</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Linda</td>
+<td style="text-align: left;">Williams</td>
+<td style="text-align: right;">2971</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mildred</td>
+<td style="text-align: left;">Bailey</td>
+<td style="text-align: right;">2972</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jennifer</td>
+<td style="text-align: left;">Davis</td>
+<td style="text-align: right;">2973</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darrell</td>
+<td style="text-align: left;">Power</td>
+<td style="text-align: right;">2973</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ellen</td>
+<td style="text-align: left;">Simpson</td>
+<td style="text-align: right;">2977</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Elaine</td>
+<td style="text-align: left;">Stevens</td>
+<td style="text-align: right;">2981</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Samantha</td>
+<td style="text-align: left;">Duncan</td>
+<td style="text-align: right;">2982</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Terri</td>
+<td style="text-align: left;">Vasquez</td>
+<td style="text-align: right;">2982</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ron</td>
+<td style="text-align: left;">Deluca</td>
+<td style="text-align: right;">2983</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Edgar</td>
+<td style="text-align: left;">Rhoads</td>
+<td style="text-align: right;">2983</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Melvin</td>
+<td style="text-align: left;">Ellington</td>
+<td style="text-align: right;">2988</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Erin</td>
+<td style="text-align: left;">Dunn</td>
+<td style="text-align: right;">2989</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Clayton</td>
+<td style="text-align: left;">Barbee</td>
+<td style="text-align: right;">2990</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Claude</td>
+<td style="text-align: left;">Herzog</td>
+<td style="text-align: right;">2996</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Carmen</td>
+<td style="text-align: left;">Owens</td>
+<td style="text-align: right;">2996</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Phillip</td>
+<td style="text-align: left;">Holm</td>
+<td style="text-align: right;">3002</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kathleen</td>
+<td style="text-align: left;">Adams</td>
+<td style="text-align: right;">3003</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Diana</td>
+<td style="text-align: left;">Alexander</td>
+<td style="text-align: right;">3007</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mario</td>
+<td style="text-align: left;">Cheatham</td>
+<td style="text-align: right;">3007</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stephanie</td>
+<td style="text-align: left;">Mitchell</td>
+<td style="text-align: right;">3008</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gail</td>
+<td style="text-align: left;">Knight</td>
+<td style="text-align: right;">3009</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Eduardo</td>
+<td style="text-align: left;">Hiatt</td>
+<td style="text-align: right;">3011</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cheryl</td>
+<td style="text-align: left;">Murphy</td>
+<td style="text-align: right;">3014</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tamara</td>
+<td style="text-align: left;">Nguyen</td>
+<td style="text-align: right;">3020</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dianne</td>
+<td style="text-align: left;">Shelton</td>
+<td style="text-align: right;">3026</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glenn</td>
+<td style="text-align: left;">Pullen</td>
+<td style="text-align: right;">3029</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Perry</td>
+<td style="text-align: left;">Swafford</td>
+<td style="text-align: right;">3036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">April</td>
+<td style="text-align: left;">Burns</td>
+<td style="text-align: right;">3042</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eric</td>
+<td style="text-align: left;">Robert</td>
+<td style="text-align: right;">3042</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shelly</td>
+<td style="text-align: left;">Watts</td>
+<td style="text-align: right;">3042</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Christy</td>
+<td style="text-align: left;">Vargas</td>
+<td style="text-align: right;">3045</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nancy</td>
+<td style="text-align: left;">Thomas</td>
+<td style="text-align: right;">3048</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lisa</td>
+<td style="text-align: left;">Anderson</td>
+<td style="text-align: right;">3049</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ivan</td>
+<td style="text-align: left;">Cromwell</td>
+<td style="text-align: right;">3052</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Enrique</td>
+<td style="text-align: left;">Forsythe</td>
+<td style="text-align: right;">3052</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mark</td>
+<td style="text-align: left;">Rinehart</td>
+<td style="text-align: right;">3054</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kristina</td>
+<td style="text-align: left;">Chambers</td>
+<td style="text-align: right;">3056</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Arlene</td>
+<td style="text-align: left;">Harvey</td>
+<td style="text-align: right;">3056</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Douglas</td>
+<td style="text-align: left;">Graf</td>
+<td style="text-align: right;">3057</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alan</td>
+<td style="text-align: left;">Kahn</td>
+<td style="text-align: right;">3059</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bryan</td>
+<td style="text-align: left;">Hardison</td>
+<td style="text-align: right;">3067</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Patricia</td>
+<td style="text-align: left;">Johnson</td>
+<td style="text-align: right;">3071</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Valerie</td>
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">3075</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Greg</td>
+<td style="text-align: left;">Robins</td>
+<td style="text-align: right;">3076</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jamie</td>
+<td style="text-align: left;">Waugh</td>
+<td style="text-align: right;">3076</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ashley</td>
+<td style="text-align: left;">Richardson</td>
+<td style="text-align: right;">3079</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hilda</td>
+<td style="text-align: left;">Hopkins</td>
+<td style="text-align: right;">3080</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hector</td>
+<td style="text-align: left;">Poindexter</td>
+<td style="text-align: right;">3086</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bill</td>
+<td style="text-align: left;">Gavin</td>
+<td style="text-align: right;">3087</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Matthew</td>
+<td style="text-align: left;">Mahan</td>
+<td style="text-align: right;">3089</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brenda</td>
+<td style="text-align: left;">Wright</td>
+<td style="text-align: right;">3092</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bradley</td>
+<td style="text-align: left;">Motley</td>
+<td style="text-align: right;">3094</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gabriel</td>
+<td style="text-align: left;">Harder</td>
+<td style="text-align: right;">3097</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Terrance</td>
+<td style="text-align: left;">Roush</td>
+<td style="text-align: right;">3100</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Karen</td>
+<td style="text-align: left;">Jackson</td>
+<td style="text-align: right;">3103</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Evelyn</td>
+<td style="text-align: left;">Morgan</td>
+<td style="text-align: right;">3104</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eddie</td>
+<td style="text-align: left;">Tomlin</td>
+<td style="text-align: right;">3104</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gilbert</td>
+<td style="text-align: left;">Sledge</td>
+<td style="text-align: right;">3107</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Denise</td>
+<td style="text-align: left;">Kelly</td>
+<td style="text-align: right;">3109</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beatrice</td>
+<td style="text-align: left;">Arnold</td>
+<td style="text-align: right;">3112</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ben</td>
+<td style="text-align: left;">Easter</td>
+<td style="text-align: right;">3112</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Beth</td>
+<td style="text-align: left;">Franklin</td>
+<td style="text-align: right;">3112</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Michele</td>
+<td style="text-align: left;">Grant</td>
+<td style="text-align: right;">3113</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jaime</td>
+<td style="text-align: left;">Nettles</td>
+<td style="text-align: right;">3116</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Amanda</td>
+<td style="text-align: left;">Carter</td>
+<td style="text-align: right;">3118</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jane</td>
+<td style="text-align: left;">Bennett</td>
+<td style="text-align: right;">3119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lucille</td>
+<td style="text-align: left;">Holmes</td>
+<td style="text-align: right;">3124</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Richard</td>
+<td style="text-align: left;">Mccrary</td>
+<td style="text-align: right;">3128</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Steven</td>
+<td style="text-align: left;">Curley</td>
+<td style="text-align: right;">3130</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Randy</td>
+<td style="text-align: left;">Gaither</td>
+<td style="text-align: right;">3132</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Allison</td>
+<td style="text-align: left;">Stanley</td>
+<td style="text-align: right;">3135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ian</td>
+<td style="text-align: left;">Still</td>
+<td style="text-align: right;">3136</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brad</td>
+<td style="text-align: left;">Mccurdy</td>
+<td style="text-align: right;">3145</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Michael</td>
+<td style="text-align: left;">Silverman</td>
+<td style="text-align: right;">3145</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ruby</td>
+<td style="text-align: left;">Washington</td>
+<td style="text-align: right;">3145</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leroy</td>
+<td style="text-align: left;">Bustamante</td>
+<td style="text-align: right;">3154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jordan</td>
+<td style="text-align: left;">Archuleta</td>
+<td style="text-align: right;">3159</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jessie</td>
+<td style="text-align: left;">Banks</td>
+<td style="text-align: right;">3159</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gene</td>
+<td style="text-align: left;">Sanborn</td>
+<td style="text-align: right;">3164</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gloria</td>
+<td style="text-align: left;">Cook</td>
+<td style="text-align: right;">3166</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Clifton</td>
+<td style="text-align: left;">Malcolm</td>
+<td style="text-align: right;">3169</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cathy</td>
+<td style="text-align: left;">Spencer</td>
+<td style="text-align: right;">3170</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sonia</td>
+<td style="text-align: left;">Gregory</td>
+<td style="text-align: right;">3177</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ricky</td>
+<td style="text-align: left;">Shelby</td>
+<td style="text-align: right;">3178</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jennie</td>
+<td style="text-align: left;">Terry</td>
+<td style="text-align: right;">3184</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clifford</td>
+<td style="text-align: left;">Bowens</td>
+<td style="text-align: right;">3191</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tracey</td>
+<td style="text-align: left;">Barrett</td>
+<td style="text-align: right;">3192</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Felicia</td>
+<td style="text-align: left;">Sutton</td>
+<td style="text-align: right;">3192</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Clarence</td>
+<td style="text-align: left;">Gamez</td>
+<td style="text-align: right;">3193</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Susan</td>
+<td style="text-align: left;">Wilson</td>
+<td style="text-align: right;">3208</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Carole</td>
+<td style="text-align: left;">Barnett</td>
+<td style="text-align: right;">3215</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Reginald</td>
+<td style="text-align: left;">Kinder</td>
+<td style="text-align: right;">3230</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jay</td>
+<td style="text-align: left;">Robb</td>
+<td style="text-align: right;">3233</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dale</td>
+<td style="text-align: left;">Ratcliff</td>
+<td style="text-align: right;">3235</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Joe</td>
+<td style="text-align: left;">Gilliland</td>
+<td style="text-align: right;">3238</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Byron</td>
+<td style="text-align: left;">Box</td>
+<td style="text-align: right;">3240</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rick</td>
+<td style="text-align: left;">Mattox</td>
+<td style="text-align: right;">3243</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Joyce</td>
+<td style="text-align: left;">Edwards</td>
+<td style="text-align: right;">3244</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Andre</td>
+<td style="text-align: left;">Rapp</td>
+<td style="text-align: right;">3252</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lucy</td>
+<td style="text-align: left;">Wheeler</td>
+<td style="text-align: right;">3252</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ross</td>
+<td style="text-align: left;">Grey</td>
+<td style="text-align: right;">3262</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ken</td>
+<td style="text-align: left;">Prewitt</td>
+<td style="text-align: right;">3262</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ted</td>
+<td style="text-align: left;">Breaux</td>
+<td style="text-align: right;">3263</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Javier</td>
+<td style="text-align: left;">Elrod</td>
+<td style="text-align: right;">3263</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Clyde</td>
+<td style="text-align: left;">Tobias</td>
+<td style="text-align: right;">3265</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Amber</td>
+<td style="text-align: left;">Dixon</td>
+<td style="text-align: right;">3266</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Erika</td>
+<td style="text-align: left;">Pena</td>
+<td style="text-align: right;">3266</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Deborah</td>
+<td style="text-align: left;">Walker</td>
+<td style="text-align: right;">3272</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jeffery</td>
+<td style="text-align: left;">Pinson</td>
+<td style="text-align: right;">3274</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Philip</td>
+<td style="text-align: left;">Causey</td>
+<td style="text-align: right;">3279</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Theodore</td>
+<td style="text-align: left;">Culp</td>
+<td style="text-align: right;">3279</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nathan</td>
+<td style="text-align: left;">Runyon</td>
+<td style="text-align: right;">3282</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dustin</td>
+<td style="text-align: left;">Gillette</td>
+<td style="text-align: right;">3283</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nina</td>
+<td style="text-align: left;">Soto</td>
+<td style="text-align: right;">3284</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lee</td>
+<td style="text-align: left;">Hawks</td>
+<td style="text-align: right;">3286</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Salvador</td>
+<td style="text-align: left;">Teel</td>
+<td style="text-align: right;">3296</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jimmie</td>
+<td style="text-align: left;">Eggleston</td>
+<td style="text-align: right;">3300</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Edward</td>
+<td style="text-align: left;">Baugh</td>
+<td style="text-align: right;">3302</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Joshua</td>
+<td style="text-align: left;">Mark</td>
+<td style="text-align: right;">3302</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kent</td>
+<td style="text-align: left;">Arsenault</td>
+<td style="text-align: right;">3305</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bessie</td>
+<td style="text-align: left;">Morrison</td>
+<td style="text-align: right;">3306</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Guy</td>
+<td style="text-align: left;">Brownlee</td>
+<td style="text-align: right;">3309</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Andrew</td>
+<td style="text-align: left;">Purdy</td>
+<td style="text-align: right;">3315</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Esther</td>
+<td style="text-align: left;">Crawford</td>
+<td style="text-align: right;">3320</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Erik</td>
+<td style="text-align: left;">Guillen</td>
+<td style="text-align: right;">3320</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Derek</td>
+<td style="text-align: left;">Blakely</td>
+<td style="text-align: right;">3321</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jimmy</td>
+<td style="text-align: left;">Schrader</td>
+<td style="text-align: right;">3326</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dawn</td>
+<td style="text-align: left;">Sullivan</td>
+<td style="text-align: right;">3326</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Terry</td>
+<td style="text-align: left;">Carlson</td>
+<td style="text-align: right;">3347</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ronald</td>
+<td style="text-align: left;">Weiner</td>
+<td style="text-align: right;">3354</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Duane</td>
+<td style="text-align: left;">Tubbs</td>
+<td style="text-align: right;">3355</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Danielle</td>
+<td style="text-align: left;">Daniels</td>
+<td style="text-align: right;">3358</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sandra</td>
+<td style="text-align: left;">Martin</td>
+<td style="text-align: right;">3360</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Misty</td>
+<td style="text-align: left;">Lambert</td>
+<td style="text-align: right;">3366</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Becky</td>
+<td style="text-align: left;">Miles</td>
+<td style="text-align: right;">3366</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dean</td>
+<td style="text-align: left;">Sauer</td>
+<td style="text-align: right;">3366</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Theresa</td>
+<td style="text-align: left;">Watson</td>
+<td style="text-align: right;">3375</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Olga</td>
+<td style="text-align: left;">Jimenez</td>
+<td style="text-align: right;">3381</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Marc</td>
+<td style="text-align: left;">Outlaw</td>
+<td style="text-align: right;">3386</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Joseph</td>
+<td style="text-align: left;">Joy</td>
+<td style="text-align: right;">3389</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nathaniel</td>
+<td style="text-align: left;">Adam</td>
+<td style="text-align: right;">3394</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Todd</td>
+<td style="text-align: left;">Tan</td>
+<td style="text-align: right;">3398</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Teresa</td>
+<td style="text-align: left;">Rogers</td>
+<td style="text-align: right;">3403</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Roy</td>
+<td style="text-align: left;">Whiting</td>
+<td style="text-align: right;">3409</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Veronica</td>
+<td style="text-align: left;">Stone</td>
+<td style="text-align: right;">3410</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Betty</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: right;">3412</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Virginia</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">3414</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Miguel</td>
+<td style="text-align: left;">Betancourt</td>
+<td style="text-align: right;">3415</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lawrence</td>
+<td style="text-align: left;">Lawton</td>
+<td style="text-align: right;">3415</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Patrick</td>
+<td style="text-align: left;">Newsom</td>
+<td style="text-align: right;">3415</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leonard</td>
+<td style="text-align: left;">Schofield</td>
+<td style="text-align: right;">3418</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Carolyn</td>
+<td style="text-align: left;">Perez</td>
+<td style="text-align: right;">3419</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alvin</td>
+<td style="text-align: left;">Deloach</td>
+<td style="text-align: right;">3420</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Isaac</td>
+<td style="text-align: left;">Oglesby</td>
+<td style="text-align: right;">3424</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Juanita</td>
+<td style="text-align: left;">Mason</td>
+<td style="text-align: right;">3434</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cassandra</td>
+<td style="text-align: left;">Walters</td>
+<td style="text-align: right;">3435</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Everett</td>
+<td style="text-align: left;">Banda</td>
+<td style="text-align: right;">3436</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kathy</td>
+<td style="text-align: left;">James</td>
+<td style="text-align: right;">3439</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wanda</td>
+<td style="text-align: left;">Patterson</td>
+<td style="text-align: right;">3446</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Troy</td>
+<td style="text-align: left;">Quigley</td>
+<td style="text-align: right;">3446</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gina</td>
+<td style="text-align: left;">Williamson</td>
+<td style="text-align: right;">3446</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">James</td>
+<td style="text-align: left;">Gannon</td>
+<td style="text-align: right;">3448</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tracy</td>
+<td style="text-align: left;">Herrmann</td>
+<td style="text-align: right;">3448</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marilyn</td>
+<td style="text-align: left;">Ross</td>
+<td style="text-align: right;">3449</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Brittany</td>
+<td style="text-align: left;">Riley</td>
+<td style="text-align: right;">3450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Debra</td>
+<td style="text-align: left;">Nelson</td>
+<td style="text-align: right;">3452</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tracy</td>
+<td style="text-align: left;">Cole</td>
+<td style="text-align: right;">3453</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marcus</td>
+<td style="text-align: left;">Hidalgo</td>
+<td style="text-align: right;">3457</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ramon</td>
+<td style="text-align: left;">Choate</td>
+<td style="text-align: right;">3459</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Arthur</td>
+<td style="text-align: left;">Simpkins</td>
+<td style="text-align: right;">3463</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Maurice</td>
+<td style="text-align: left;">Crawley</td>
+<td style="text-align: right;">3469</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Monica</td>
+<td style="text-align: left;">Hicks</td>
+<td style="text-align: right;">3470</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Janet</td>
+<td style="text-align: left;">Phillips</td>
+<td style="text-align: right;">3475</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Audrey</td>
+<td style="text-align: left;">Ray</td>
+<td style="text-align: right;">3477</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vickie</td>
+<td style="text-align: left;">Brewer</td>
+<td style="text-align: right;">3484</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Daryl</td>
+<td style="text-align: left;">Larue</td>
+<td style="text-align: right;">3488</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Maria</td>
+<td style="text-align: left;">Miller</td>
+<td style="text-align: right;">3494</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Geraldine</td>
+<td style="text-align: left;">Perkins</td>
+<td style="text-align: right;">3497</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alice</td>
+<td style="text-align: left;">Stewart</td>
+<td style="text-align: right;">3499</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Craig</td>
+<td style="text-align: left;">Morrell</td>
+<td style="text-align: right;">3502</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Manuel</td>
+<td style="text-align: left;">Murrell</td>
+<td style="text-align: right;">3504</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jeanne</td>
+<td style="text-align: left;">Lawson</td>
+<td style="text-align: right;">3508</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Angel</td>
+<td style="text-align: left;">Barclay</td>
+<td style="text-align: right;">3510</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marion</td>
+<td style="text-align: left;">Ocampo</td>
+<td style="text-align: right;">3512</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Patsy</td>
+<td style="text-align: left;">Davidson</td>
+<td style="text-align: right;">3513</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Julia</td>
+<td style="text-align: left;">Flores</td>
+<td style="text-align: right;">3513</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Roberto</td>
+<td style="text-align: left;">Vu</td>
+<td style="text-align: right;">3513</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Judith</td>
+<td style="text-align: left;">Cox</td>
+<td style="text-align: right;">3515</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sharon</td>
+<td style="text-align: left;">Robinson</td>
+<td style="text-align: right;">3522</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sara</td>
+<td style="text-align: left;">Perry</td>
+<td style="text-align: right;">3524</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Harold</td>
+<td style="text-align: left;">Martino</td>
+<td style="text-align: right;">3525</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Renee</td>
+<td style="text-align: left;">Lane</td>
+<td style="text-align: right;">3536</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Walter</td>
+<td style="text-align: left;">Perryman</td>
+<td style="text-align: right;">3538</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jeff</td>
+<td style="text-align: left;">East</td>
+<td style="text-align: right;">3542</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Joanne</td>
+<td style="text-align: left;">Robertson</td>
+<td style="text-align: right;">3550</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tom</td>
+<td style="text-align: left;">Milner</td>
+<td style="text-align: right;">3561</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Courtney</td>
+<td style="text-align: left;">Day</td>
+<td style="text-align: right;">3563</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Heather</td>
+<td style="text-align: left;">Morris</td>
+<td style="text-align: right;">3567</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sylvia</td>
+<td style="text-align: left;">Ortiz</td>
+<td style="text-align: right;">3567</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alma</td>
+<td style="text-align: left;">Austin</td>
+<td style="text-align: right;">3568</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ramona</td>
+<td style="text-align: left;">Hale</td>
+<td style="text-align: right;">3568</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gladys</td>
+<td style="text-align: left;">Hamilton</td>
+<td style="text-align: right;">3571</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wendy</td>
+<td style="text-align: left;">Harrison</td>
+<td style="text-align: right;">3571</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Violet</td>
+<td style="text-align: left;">Rodriquez</td>
+<td style="text-align: right;">3576</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jessie</td>
+<td style="text-align: left;">Milam</td>
+<td style="text-align: right;">3579</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Amy</td>
+<td style="text-align: left;">Lopez</td>
+<td style="text-align: right;">3583</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Joy</td>
+<td style="text-align: left;">George</td>
+<td style="text-align: right;">3596</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stephen</td>
+<td style="text-align: left;">Qualls</td>
+<td style="text-align: right;">3597</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Debbie</td>
+<td style="text-align: left;">Reyes</td>
+<td style="text-align: right;">3597</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Priscilla</td>
+<td style="text-align: left;">Lowe</td>
+<td style="text-align: right;">3606</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cindy</td>
+<td style="text-align: left;">Fisher</td>
+<td style="text-align: right;">3636</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gerald</td>
+<td style="text-align: left;">Fultz</td>
+<td style="text-align: right;">3640</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Billy</td>
+<td style="text-align: left;">Poulin</td>
+<td style="text-align: right;">3649</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Glenda</td>
+<td style="text-align: left;">Frazier</td>
+<td style="text-align: right;">3657</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Shawn</td>
+<td style="text-align: left;">Heaton</td>
+<td style="text-align: right;">3657</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shirley</td>
+<td style="text-align: left;">Allen</td>
+<td style="text-align: right;">3662</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lena</td>
+<td style="text-align: left;">Jensen</td>
+<td style="text-align: right;">3663</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Catherine</td>
+<td style="text-align: left;">Campbell</td>
+<td style="text-align: right;">3666</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jamie</td>
+<td style="text-align: left;">Rice</td>
+<td style="text-align: right;">3674</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sarah</td>
+<td style="text-align: left;">Lewis</td>
+<td style="text-align: right;">3679</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Maxine</td>
+<td style="text-align: left;">Silva</td>
+<td style="text-align: right;">3682</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kyle</td>
+<td style="text-align: left;">Spurlock</td>
+<td style="text-align: right;">3686</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Holly</td>
+<td style="text-align: left;">Fox</td>
+<td style="text-align: right;">3689</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">George</td>
+<td style="text-align: left;">Linton</td>
+<td style="text-align: right;">3689</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Terrence</td>
+<td style="text-align: left;">Gunderson</td>
+<td style="text-align: right;">3694</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stanley</td>
+<td style="text-align: left;">Scroggins</td>
+<td style="text-align: right;">3694</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tanya</td>
+<td style="text-align: left;">Gilbert</td>
+<td style="text-align: right;">3700</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Charles</td>
+<td style="text-align: left;">Kowalski</td>
+<td style="text-align: right;">3703</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Raymond</td>
+<td style="text-align: left;">Mcwhorter</td>
+<td style="text-align: right;">3708</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lori</td>
+<td style="text-align: left;">Wood</td>
+<td style="text-align: right;">3713</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ryan</td>
+<td style="text-align: left;">Salisbury</td>
+<td style="text-align: right;">3717</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jason</td>
+<td style="text-align: left;">Morrissey</td>
+<td style="text-align: right;">3718</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">John</td>
+<td style="text-align: left;">Farnsworth</td>
+<td style="text-align: right;">3722</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mitchell</td>
+<td style="text-align: left;">Westmoreland</td>
+<td style="text-align: right;">3736</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ralph</td>
+<td style="text-align: left;">Madrigal</td>
+<td style="text-align: right;">3737</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darlene</td>
+<td style="text-align: left;">Rose</td>
+<td style="text-align: right;">3745</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jim</td>
+<td style="text-align: left;">Rea</td>
+<td style="text-align: right;">3749</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Arnold</td>
+<td style="text-align: left;">Havens</td>
+<td style="text-align: right;">3752</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ana</td>
+<td style="text-align: left;">Bradley</td>
+<td style="text-align: right;">3760</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lois</td>
+<td style="text-align: left;">Butler</td>
+<td style="text-align: right;">3762</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sally</td>
+<td style="text-align: left;">Pierce</td>
+<td style="text-align: right;">3762</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mabel</td>
+<td style="text-align: left;">Holland</td>
+<td style="text-align: right;">3770</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Zachary</td>
+<td style="text-align: left;">Hite</td>
+<td style="text-align: right;">3771</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Florence</td>
+<td style="text-align: left;">Woods</td>
+<td style="text-align: right;">3775</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rosa</td>
+<td style="text-align: left;">Reynolds</td>
+<td style="text-align: right;">3779</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Carrie</td>
+<td style="text-align: left;">Porter</td>
+<td style="text-align: right;">3790</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stacey</td>
+<td style="text-align: left;">Montgomery</td>
+<td style="text-align: right;">3791</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Viola</td>
+<td style="text-align: left;">Hanson</td>
+<td style="text-align: right;">3794</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Julie</td>
+<td style="text-align: left;">Sanchez</td>
+<td style="text-align: right;">3808</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ethel</td>
+<td style="text-align: left;">Webb</td>
+<td style="text-align: right;">3810</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Helen</td>
+<td style="text-align: left;">Harris</td>
+<td style="text-align: right;">3818</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mae</td>
+<td style="text-align: left;">Fletcher</td>
+<td style="text-align: right;">3828</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Morris</td>
+<td style="text-align: left;">Mccarter</td>
+<td style="text-align: right;">3829</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nicholas</td>
+<td style="text-align: left;">Barfield</td>
+<td style="text-align: right;">3836</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jacqueline</td>
+<td style="text-align: left;">Long</td>
+<td style="text-align: right;">3855</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Alex</td>
+<td style="text-align: left;">Gresham</td>
+<td style="text-align: right;">3857</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Neil</td>
+<td style="text-align: left;">Renner</td>
+<td style="text-align: right;">3879</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Casey</td>
+<td style="text-align: left;">Mena</td>
+<td style="text-align: right;">3891</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leslie</td>
+<td style="text-align: left;">Seward</td>
+<td style="text-align: right;">3891</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Bernice</td>
+<td style="text-align: left;">Willis</td>
+<td style="text-align: right;">3892</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Crystal</td>
+<td style="text-align: left;">Ford</td>
+<td style="text-align: right;">3894</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Minnie</td>
+<td style="text-align: left;">Romero</td>
+<td style="text-align: right;">3911</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Marjorie</td>
+<td style="text-align: left;">Tucker</td>
+<td style="text-align: right;">3911</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ella</td>
+<td style="text-align: left;">Oliver</td>
+<td style="text-align: right;">3916</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mary</td>
+<td style="text-align: left;">Smith</td>
+<td style="text-align: right;">3916</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Thelma</td>
+<td style="text-align: left;">Murray</td>
+<td style="text-align: right;">3921</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Christopher</td>
+<td style="text-align: left;">Greco</td>
+<td style="text-align: right;">3930</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gertrude</td>
+<td style="text-align: left;">Castillo</td>
+<td style="text-align: right;">3936</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gordon</td>
+<td style="text-align: left;">Allard</td>
+<td style="text-align: right;">3938</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Heidi</td>
+<td style="text-align: left;">Larson</td>
+<td style="text-align: right;">3941</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Alexander</td>
+<td style="text-align: left;">Fennell</td>
+<td style="text-align: right;">3942</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Frank</td>
+<td style="text-align: left;">Waggoner</td>
+<td style="text-align: right;">3948</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bobby</td>
+<td style="text-align: left;">Boudreau</td>
+<td style="text-align: right;">3960</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jorge</td>
+<td style="text-align: left;">Olivares</td>
+<td style="text-align: right;">3962</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Margie</td>
+<td style="text-align: left;">Wade</td>
+<td style="text-align: right;">3965</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hazel</td>
+<td style="text-align: left;">Warren</td>
+<td style="text-align: right;">3970</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dave</td>
+<td style="text-align: left;">Gardiner</td>
+<td style="text-align: right;">3971</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tonya</td>
+<td style="text-align: left;">Chapman</td>
+<td style="text-align: right;">3972</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cynthia</td>
+<td style="text-align: left;">Young</td>
+<td style="text-align: right;">3973</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Melissa</td>
+<td style="text-align: left;">King</td>
+<td style="text-align: right;">3977</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kristin</td>
+<td style="text-align: left;">Johnston</td>
+<td style="text-align: right;">3981</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Roger</td>
+<td style="text-align: left;">Quintanilla</td>
+<td style="text-align: right;">3987</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rosemary</td>
+<td style="text-align: left;">Schmidt</td>
+<td style="text-align: right;">3988</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Barry</td>
+<td style="text-align: left;">Lovelace</td>
+<td style="text-align: right;">3989</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Elsie</td>
+<td style="text-align: left;">Kelley</td>
+<td style="text-align: right;">4014</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mike</td>
+<td style="text-align: left;">Way</td>
+<td style="text-align: right;">4023</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sherri</td>
+<td style="text-align: left;">Rhodes</td>
+<td style="text-align: right;">4030</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Regina</td>
+<td style="text-align: left;">Berry</td>
+<td style="text-align: right;">4051</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tommy</td>
+<td style="text-align: left;">Collazo</td>
+<td style="text-align: right;">4051</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Grace</td>
+<td style="text-align: left;">Ellis</td>
+<td style="text-align: right;">4060</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jessica</td>
+<td style="text-align: left;">Hall</td>
+<td style="text-align: right;">4150</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marsha</td>
+<td style="text-align: left;">Douglas</td>
+<td style="text-align: right;">4154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Michelle</td>
+<td style="text-align: left;">Clark</td>
+<td style="text-align: right;">4157</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brandon</td>
+<td style="text-align: left;">Huey</td>
+<td style="text-align: right;">4160</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Naomi</td>
+<td style="text-align: left;">Jennings</td>
+<td style="text-align: right;">4164</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brett</td>
+<td style="text-align: left;">Cornwell</td>
+<td style="text-align: right;">4197</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Steve</td>
+<td style="text-align: left;">Mackenzie</td>
+<td style="text-align: right;">4206</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Harry</td>
+<td style="text-align: left;">Arce</td>
+<td style="text-align: right;">4222</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Warren</td>
+<td style="text-align: left;">Sherrod</td>
+<td style="text-align: right;">4233</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Martha</td>
+<td style="text-align: left;">Gonzalez</td>
+<td style="text-align: right;">4237</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">June</td>
+<td style="text-align: left;">Carroll</td>
+<td style="text-align: right;">4261</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Curtis</td>
+<td style="text-align: left;">Irby</td>
+<td style="text-align: right;">4280</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Rhonda</td>
+<td style="text-align: left;">Kennedy</td>
+<td style="text-align: right;">4307</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sue</td>
+<td style="text-align: left;">Peters</td>
+<td style="text-align: right;">4319</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Louis</td>
+<td style="text-align: left;">Leone</td>
+<td style="text-align: right;">4333</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Angela</td>
+<td style="text-align: left;">Hernandez</td>
+<td style="text-align: right;">4362</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Janice</td>
+<td style="text-align: left;">Ward</td>
+<td style="text-align: right;">4366</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Daisy</td>
+<td style="text-align: left;">Bates</td>
+<td style="text-align: right;">4369</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tim</td>
+<td style="text-align: left;">Cary</td>
+<td style="text-align: right;">4476</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Diane</td>
+<td style="text-align: left;">Collins</td>
+<td style="text-align: right;">4514</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Elizabeth</td>
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">4531</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Justin</td>
+<td style="text-align: left;">Ngo</td>
+<td style="text-align: right;">4550</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sherry</td>
+<td style="text-align: left;">Marshall</td>
+<td style="text-align: right;">4582</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marion</td>
+<td style="text-align: left;">Snyder</td>
+<td style="text-align: right;">4599</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Russell</td>
+<td style="text-align: left;">Brinson</td>
+<td style="text-align: right;">4640</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Marcia</td>
+<td style="text-align: left;">Dean</td>
+<td style="text-align: right;">4734</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wesley</td>
+<td style="text-align: left;">Bull</td>
+<td style="text-align: right;">4808</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Clara</td>
+<td style="text-align: left;">Shaw</td>
+<td style="text-align: right;">4808</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tammy</td>
+<td style="text-align: left;">Sanders</td>
+<td style="text-align: right;">5065</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Eleanor</td>
+<td style="text-align: left;">Hunt</td>
+<td style="text-align: right;">5360</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Karl</td>
+<td style="text-align: left;">Seal</td>
+<td style="text-align: right;">5388</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="oblicz-średnią-wartość-wypożyczenia-filmu." class="level1">
+<h1>8. Oblicz średnią wartość wypożyczenia filmu.</h1>
+<p>Uważam, że to pytanie jest analogiczne do pytania numer 3., zatem powtarzam odpowiedź.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Średni koszt wypożyczenia wszystkich filmów to %.2f"</span>, avg_price[<span class="dv">1</span>,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Średni koszt wypożyczenia wszystkich filmów to 2.85"</code></pre>
+</div>
+</div>
+</section>
+<section id="oblicz-średnią-wartość-długości-filmu-we-wszystkich-kategoriach." class="level1">
+<h1>9. Oblicz średnią wartość długości filmu we wszystkich kategoriach.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>length_avg <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, ROUND(AVG(f.length), 2) AS avg</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>length_avg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">category</th>
+<th style="text-align: right;">avg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Action</td>
+<td style="text-align: right;">111.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Animation</td>
+<td style="text-align: right;">111.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Children</td>
+<td style="text-align: right;">109.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Classics</td>
+<td style="text-align: right;">111.67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comedy</td>
+<td style="text-align: right;">115.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Documentary</td>
+<td style="text-align: right;">108.75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Drama</td>
+<td style="text-align: right;">120.84</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Family</td>
+<td style="text-align: right;">114.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Foreign</td>
+<td style="text-align: right;">121.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Games</td>
+<td style="text-align: right;">127.84</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Horror</td>
+<td style="text-align: right;">112.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Music</td>
+<td style="text-align: right;">113.65</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">New</td>
+<td style="text-align: right;">111.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sci-Fi</td>
+<td style="text-align: right;">108.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sports</td>
+<td style="text-align: right;">128.20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Travel</td>
+<td style="text-align: right;">113.32</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="znajdź-najdłuższe-tytuły-filmowe-we-wszystkich-kategoriach." class="level1">
+<h1>10. Znajdź najdłuższe tytuły filmowe we wszystkich kategoriach.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>film_longest <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, MAX(f.length) AS longest_film</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>film_longest</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">category</th>
+<th style="text-align: right;">longest_film</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Action</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Animation</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Children</td>
+<td style="text-align: right;">178</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Classics</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comedy</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Documentary</td>
+<td style="text-align: right;">183</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Drama</td>
+<td style="text-align: right;">181</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Family</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Foreign</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Games</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Horror</td>
+<td style="text-align: right;">181</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Music</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">New</td>
+<td style="text-align: right;">183</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sci-Fi</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sports</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Travel</td>
+<td style="text-align: right;">185</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="znajdź-najdłuższy-film-we-wszystkich-kategoriach.-porównaj-wynik-z-pkt-10." class="level1">
+<h1>11. Znajdź najdłuższy film we wszystkich kategoriach. Porównaj wynik z pkt 10.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>film_longest <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, f.title, MAX(f.length) AS longest_film</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE f.length = 185</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name, f.title</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>film_longest</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">category</th>
+<th style="text-align: left;">title</th>
+<th style="text-align: right;">longest_film</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Action</td>
+<td style="text-align: left;">Darn Forrester</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Action</td>
+<td style="text-align: left;">Worst Banger</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Animation</td>
+<td style="text-align: left;">Gangs Pride</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Animation</td>
+<td style="text-align: left;">Pond Seattle</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comedy</td>
+<td style="text-align: left;">Control Anthem</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Games</td>
+<td style="text-align: left;">Chicago North</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Music</td>
+<td style="text-align: left;">Home Pity</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sci-Fi</td>
+<td style="text-align: left;">Soldiers Evolution</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Travel</td>
+<td style="text-align: left;">Muscle Bright</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Travel</td>
+<td style="text-align: left;">Sweet Brotherhood</td>
+<td style="text-align: right;">185</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Wyniki z tabeli z zadania 10. pokrywają się, z tym, że odrzuciliśmy wyniki poniżej 185 minut, ponieważ to był najdłuższy czas filmu. Taki czas miał film aż z 7 kategorii</p>
+<!-- -->
+
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb17" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Zadanie 4. Przykładowe tabele obrazujące łączenie"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Gabriel Szewczyk"</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">    page-layout: full</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">    fontsize: 18pt</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">    df-print: kable</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> visual</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="fu"># Bilbioteki i konfiguracja połączenia z bazą</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPostgres)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>dsn_database <span class="ot">=</span> <span class="st">"wbauer_adb_2023"</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>dsn_hostname <span class="ot">=</span> <span class="st">"pgsql-196447.vipserv.org"</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>dsn_port <span class="ot">=</span> <span class="st">"5432"</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>dsn_uid <span class="ot">=</span> <span class="st">"wbauer_adb"</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>dsn_pwd <span class="ot">=</span> <span class="st">"adb2020"</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">Postgres</span>(), <span class="at">dbname =</span> dsn_database, <span class="at">host=</span>dsn_hostname, <span class="at">port=</span>dsn_port, <span class="at">user=</span>dsn_uid, <span class="at">password=</span>dsn_pwd)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="fu"># 1. Znajdź listę wszystkich filmów o tej samej długości.</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>Podaję długość, i otrzymuję listę filmów</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>length <span class="ot">=</span> <span class="dv">47</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>same_length <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(<span class="st">"SELECT title, length FROM film WHERE length = %f"</span>, length))</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>same_length</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># 2. Znajdź wszystkich klientów mieszkających w tym samym mieście.</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>Wybrane zostało miasto Londyn, poniżej zaprezentowano wyniki.</span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>client_from_city<span class="ot">&lt;-</span> <span class="cf">function</span>(city){</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(city)) {</span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>    city_customers_list <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>     <span class="st">"SELECT ct.city, c.first_name, c.last_name</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a><span class="st">      FROM customer AS c</span></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a><span class="st">      INNER JOIN address a ON c.address_id = a.address_id</span></span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a><span class="st">      INNER JOIN city ct ON a.city_id = ct.city_id </span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a><span class="st">      WHERE city = '%s'</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a><span class="st">      ORDER BY c.first_name, c.last_name"</span>, city))</span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(city_customers_list)</span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Osoby mieszkające w Londynie:"</span>)</span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a><span class="fu">client_from_city</span>(<span class="st">'London'</span>)</span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a><span class="fu"># 3. Oblicz średni koszt wypożyczenia wszystkich filmów.</span></span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>avg_price <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT AVG(p.amount) as avg</span></span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM payment as p</span></span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN rental r ON p.rental_id = r.rental_id</span></span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN inventory i ON r.inventory_id = i.inventory_id</span></span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON i.film_id = f.film_id</span></span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY f.film_id"</span>))</span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Średni koszt wypożyczenia wszystkich filmów to %.2f"</span>, avg_price[<span class="dv">1</span>,<span class="dv">1</span>])</span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a><span class="fu"># 4. Oblicz i wyświetl liczbę filmów we wszystkich kategoriach.</span></span>
+<span id="cb17-82"><a href="#cb17-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-85"><a href="#cb17-85" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-86"><a href="#cb17-86" aria-hidden="true" tabindex="-1"></a>category_of_film <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb17-87"><a href="#cb17-87" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, COUNT(fcat.film_id) AS count</span></span>
+<span id="cb17-88"><a href="#cb17-88" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM category AS cat </span></span>
+<span id="cb17-89"><a href="#cb17-89" aria-hidden="true" tabindex="-1"></a><span class="st">  INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb17-90"><a href="#cb17-90" aria-hidden="true" tabindex="-1"></a><span class="st">  GROUP BY cat.name"</span>)</span>
+<span id="cb17-91"><a href="#cb17-91" aria-hidden="true" tabindex="-1"></a>category_of_film</span>
+<span id="cb17-92"><a href="#cb17-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-93"><a href="#cb17-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-94"><a href="#cb17-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-95"><a href="#cb17-95" aria-hidden="true" tabindex="-1"></a><span class="fu"># 5. Wyświetl liczbę wszystkich klientów pogrupowanych według kraju.</span></span>
+<span id="cb17-96"><a href="#cb17-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-99"><a href="#cb17-99" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-100"><a href="#cb17-100" aria-hidden="true" tabindex="-1"></a>clients_by_country <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, </span>
+<span id="cb17-101"><a href="#cb17-101" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT ctr.country AS country, COUNT(c.customer_id)AS count</span></span>
+<span id="cb17-102"><a href="#cb17-102" aria-hidden="true" tabindex="-1"></a><span class="st">   FROM customer AS c</span></span>
+<span id="cb17-103"><a href="#cb17-103" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN address a ON c.address_id = a.address_id</span></span>
+<span id="cb17-104"><a href="#cb17-104" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN city ct ON a.city_id = ct.city_id</span></span>
+<span id="cb17-105"><a href="#cb17-105" aria-hidden="true" tabindex="-1"></a><span class="st">   INNER JOIN country ctr ON ct.country_id = ctr.country_id</span></span>
+<span id="cb17-106"><a href="#cb17-106" aria-hidden="true" tabindex="-1"></a><span class="st">   GROUP BY ctr.country</span></span>
+<span id="cb17-107"><a href="#cb17-107" aria-hidden="true" tabindex="-1"></a><span class="st">   ORDER BY ctr.country"</span>)</span>
+<span id="cb17-108"><a href="#cb17-108" aria-hidden="true" tabindex="-1"></a>clients_by_country</span>
+<span id="cb17-109"><a href="#cb17-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-110"><a href="#cb17-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-111"><a href="#cb17-111" aria-hidden="true" tabindex="-1"></a><span class="fu"># 6. Wyświetl informacje o sklepie, który ma więcej niż 100 klientów i mniej niż 300 klientów.</span></span>
+<span id="cb17-112"><a href="#cb17-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-115"><a href="#cb17-115" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-116"><a href="#cb17-116" aria-hidden="true" tabindex="-1"></a>shop_with_100_300_customers <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,<span class="st">"SELECT a.address, ct.city, COUNT(c.customer_id) AS clients </span></span>
+<span id="cb17-117"><a href="#cb17-117" aria-hidden="true" tabindex="-1"></a><span class="st"> FROM store AS st</span></span>
+<span id="cb17-118"><a href="#cb17-118" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN address a ON st.address_id = a.address_id</span></span>
+<span id="cb17-119"><a href="#cb17-119" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN customer c ON st.store_id = c.store_id</span></span>
+<span id="cb17-120"><a href="#cb17-120" aria-hidden="true" tabindex="-1"></a><span class="st"> INNER JOIN city ct ON a.city_id = ct.city_id</span></span>
+<span id="cb17-121"><a href="#cb17-121" aria-hidden="true" tabindex="-1"></a><span class="st"> GROUP BY a.address, ct.city</span></span>
+<span id="cb17-122"><a href="#cb17-122" aria-hidden="true" tabindex="-1"></a><span class="st"> HAVING COUNT(c.customer_id) BETWEEN 100 AND 300"</span>)</span>
+<span id="cb17-123"><a href="#cb17-123" aria-hidden="true" tabindex="-1"></a>shop_with_100_300_customers</span>
+<span id="cb17-124"><a href="#cb17-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-125"><a href="#cb17-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-126"><a href="#cb17-126" aria-hidden="true" tabindex="-1"></a><span class="fu"># 7. Wybierz wszystkich klientów, którzy oglądali filmy ponad 200 godzin.</span></span>
+<span id="cb17-127"><a href="#cb17-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-130"><a href="#cb17-130" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-131"><a href="#cb17-131" aria-hidden="true" tabindex="-1"></a>client_by_sum_length <span class="ot">&lt;-</span> <span class="cf">function</span>(sum_min){</span>
+<span id="cb17-132"><a href="#cb17-132" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.integer</span>(sum_min) <span class="sc">||</span> <span class="fu">is.double</span>(sum_min)) {</span>
+<span id="cb17-133"><a href="#cb17-133" aria-hidden="true" tabindex="-1"></a>    sum_film_length <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con, <span class="fu">sprintf</span>(</span>
+<span id="cb17-134"><a href="#cb17-134" aria-hidden="true" tabindex="-1"></a>      <span class="st">"SELECT c.first_name, c.last_name, SUM(f.length) AS sum</span></span>
+<span id="cb17-135"><a href="#cb17-135" aria-hidden="true" tabindex="-1"></a><span class="st">       FROM customer as c</span></span>
+<span id="cb17-136"><a href="#cb17-136" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN rental r ON c.customer_id = r.customer_id</span></span>
+<span id="cb17-137"><a href="#cb17-137" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN inventory i ON r.inventory_id = i.inventory_id</span></span>
+<span id="cb17-138"><a href="#cb17-138" aria-hidden="true" tabindex="-1"></a><span class="st">       INNER JOIN film f ON i.film_id = f.film_id</span></span>
+<span id="cb17-139"><a href="#cb17-139" aria-hidden="true" tabindex="-1"></a><span class="st">       GROUP BY c.first_name, c.last_name</span></span>
+<span id="cb17-140"><a href="#cb17-140" aria-hidden="true" tabindex="-1"></a><span class="st">       HAVING SUM(f.length) &gt;= %f</span></span>
+<span id="cb17-141"><a href="#cb17-141" aria-hidden="true" tabindex="-1"></a><span class="st">       ORDER BY sum, c.last_name, c.first_name"</span>, sum_min))</span>
+<span id="cb17-142"><a href="#cb17-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(sum_film_length)</span>
+<span id="cb17-143"><a href="#cb17-143" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb17-144"><a href="#cb17-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb17-145"><a href="#cb17-145" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-146"><a href="#cb17-146" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-147"><a href="#cb17-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-148"><a href="#cb17-148" aria-hidden="true" tabindex="-1"></a><span class="fu">client_by_sum_length</span>(<span class="dv">1200</span>) <span class="co"># input 1200 bo 200h * 60 min to 1200</span></span>
+<span id="cb17-149"><a href="#cb17-149" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-150"><a href="#cb17-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-151"><a href="#cb17-151" aria-hidden="true" tabindex="-1"></a><span class="fu"># 8. Oblicz średnią wartość wypożyczenia filmu.</span></span>
+<span id="cb17-152"><a href="#cb17-152" aria-hidden="true" tabindex="-1"></a>Uważam, że to pytanie jest analogiczne do pytania numer 3., zatem powtarzam odpowiedź.</span>
+<span id="cb17-155"><a href="#cb17-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-156"><a href="#cb17-156" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">"Średni koszt wypożyczenia wszystkich filmów to %.2f"</span>, avg_price[<span class="dv">1</span>,<span class="dv">1</span>])</span>
+<span id="cb17-157"><a href="#cb17-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-158"><a href="#cb17-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-159"><a href="#cb17-159" aria-hidden="true" tabindex="-1"></a><span class="fu"># 9. Oblicz średnią wartość długości filmu we wszystkich kategoriach.</span></span>
+<span id="cb17-160"><a href="#cb17-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-163"><a href="#cb17-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-164"><a href="#cb17-164" aria-hidden="true" tabindex="-1"></a>length_avg <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb17-165"><a href="#cb17-165" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, ROUND(AVG(f.length), 2) AS avg</span></span>
+<span id="cb17-166"><a href="#cb17-166" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb17-167"><a href="#cb17-167" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb17-168"><a href="#cb17-168" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb17-169"><a href="#cb17-169" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name</span></span>
+<span id="cb17-170"><a href="#cb17-170" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb17-171"><a href="#cb17-171" aria-hidden="true" tabindex="-1"></a>length_avg</span>
+<span id="cb17-172"><a href="#cb17-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-173"><a href="#cb17-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-174"><a href="#cb17-174" aria-hidden="true" tabindex="-1"></a><span class="fu"># 10. Znajdź najdłuższe tytuły filmowe we wszystkich kategoriach.</span></span>
+<span id="cb17-175"><a href="#cb17-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-178"><a href="#cb17-178" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-179"><a href="#cb17-179" aria-hidden="true" tabindex="-1"></a>film_longest <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb17-180"><a href="#cb17-180" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, MAX(f.length) AS longest_film</span></span>
+<span id="cb17-181"><a href="#cb17-181" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb17-182"><a href="#cb17-182" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb17-183"><a href="#cb17-183" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb17-184"><a href="#cb17-184" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name</span></span>
+<span id="cb17-185"><a href="#cb17-185" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb17-186"><a href="#cb17-186" aria-hidden="true" tabindex="-1"></a>film_longest</span>
+<span id="cb17-187"><a href="#cb17-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-188"><a href="#cb17-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-189"><a href="#cb17-189" aria-hidden="true" tabindex="-1"></a><span class="fu"># 11. Znajdź najdłuższy film we wszystkich kategoriach. Porównaj wynik z pkt 10.</span></span>
+<span id="cb17-190"><a href="#cb17-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-193"><a href="#cb17-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb17-194"><a href="#cb17-194" aria-hidden="true" tabindex="-1"></a>film_longest <span class="ot">&lt;-</span> <span class="fu">dbGetQuery</span>(con,</span>
+<span id="cb17-195"><a href="#cb17-195" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SELECT cat.name AS category, f.title, MAX(f.length) AS longest_film</span></span>
+<span id="cb17-196"><a href="#cb17-196" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM category AS cat</span></span>
+<span id="cb17-197"><a href="#cb17-197" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film_category fcat ON cat.category_id = fcat.category_id</span></span>
+<span id="cb17-198"><a href="#cb17-198" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN film f ON fcat.film_id = f.film_id</span></span>
+<span id="cb17-199"><a href="#cb17-199" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE f.length = 185</span></span>
+<span id="cb17-200"><a href="#cb17-200" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY cat.name, f.title</span></span>
+<span id="cb17-201"><a href="#cb17-201" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY cat.name ASC"</span>)</span>
+<span id="cb17-202"><a href="#cb17-202" aria-hidden="true" tabindex="-1"></a>film_longest</span>
+<span id="cb17-203"><a href="#cb17-203" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-204"><a href="#cb17-204" aria-hidden="true" tabindex="-1"></a>Wyniki z tabeli z zadania 10. pokrywają się, z tym, że odrzuciliśmy wyniki poniżej 185 minut, ponieważ to był najdłuższy czas filmu. Taki czas miał film aż z 7 kategorii</span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

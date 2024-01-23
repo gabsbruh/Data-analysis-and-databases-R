@@ -1,0 +1,239 @@
+---
+title: "Zadanie 10. Eksploracja danych"
+author: "Gabriel Szewczyk"
+date: 01.05.2024
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+    code-block-border-left: true
+editor: visual
+---
+
+## Załadowanie paczek i zbioru danych
+
+```{r load, warning=FALSE}
+library(tidyverse)
+beauty_set <- read_csv("beauty.csv")
+# polaczenie kolumn class
+beauty_set_tidy <- beauty_set |> 
+  mutate(unified_class = rowSums(select(beauty_set, starts_with("class")) * (1:30))) |> mutate(beauty_set, across(starts_with("class"), ~NULL)) |> rename(class = unified_class)
+
+```
+
+### Czy wszystkie dane są poprawne? Czy nie ma jakichś niespójności? Z czego one mogą wynikać jeśli występują?
+
+```{r pytanie_1}
+glimpse(beauty_set_tidy)
+```
+
+* Niespójności który dostrzegłem były związane przede wszystkim z koniecznością posiadania przez dataset niektórych kolumn, ponieważ ich sens sam się w sobie zawierał w niektórych przypadkach
+
+### Czy ocena nauczyciela i ocena kursu mają ze spobą jakiś związek? Czy charakter tego związku jest taki sam dla nauczycielami będącymi kobietami i mężczyznami? Albo doświadczonych (tenured)? Albo należących do mniejszości?
+
+```{r pytanie2}
+# profevaluation do courseevaluation
+sprintf('Koorelacja między oceną nauczyciela a kursu: %f', cor(beauty_set_tidy$profevaluation, beauty_set_tidy$courseevaluation))
+
+ggplot(data = beauty_set_tidy,
+        mapping = aes(x = profevaluation, 
+        y = courseevaluation, color = as.factor(female))
+        ) +
+        geom_point() +
+        geom_smooth(method = 'lm', se=FALSE) +
+        scale_color_manual(values = setNames(c('blue', '#DB72FB'), levels(as.factor(beauty_set_tidy$female)))) +
+        labs(title = 'Zależność oceny nauczyciela od oceny kursu i płci', color = c('0=Mężczyźni 1=Kobiety'))
+
+ggplot(data = beauty_set_tidy,
+        mapping = aes(x = profevaluation, 
+        y = courseevaluation, color = as.factor(tenured))
+        ) +
+        geom_point() +
+        geom_smooth(method = 'lm', se=FALSE) +
+        labs(title = 'Zależność oceny nauczyciela od oceny kursu i doświadczenia', color = c('0=Niedoświadczony 1=Doświadczony')) +
+        scale_color_manual(values = setNames(c('green', 'red'), levels(as.factor(beauty_set_tidy$tenured))))
+
+ggplot(data = beauty_set_tidy,
+        mapping = aes(x = profevaluation, 
+        y = courseevaluation, color = as.factor(minority))
+        ) +
+        geom_point() +
+        geom_smooth(method = 'lm', se=FALSE) +
+        labs(title = 'Zależność oceny nauczyciela od oceny kursu i doświadczenia', color = c('1=należy do mniejszości')) +
+        scale_color_manual(values = setNames(c('#713C00', 'black'), levels(as.factor(beauty_set_tidy$minority))))
+
+```
+
+* Powiązanie zmiennych oceny nauczyciela od oceny jego kursu jest bardzo mocne, ze współczynnikiem koorelacji 0.93.
+
+* Wygląda na to, że kobiety są oceniane nieco łagodniej niż mężczyźni
+
+* Co ciekawe, osoby niedoświadczone na wykresie rozrzutu wypadają lepiej niż doświadczone
+
+* Ocena nie zależy od tego czy osoba należy do mniejszości czy nie
+
+
+### Czy płeć oceniających urodę nauczyciela wpływa na ocenę? Czy to ma jakiś związek z jego płcią, doświadczeniem, czy przynależnością do mniejszości?
+
+```{r pytanie_3_}
+# zwiazek z plcia
+meanf2f <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(female == 1)
+meanf2f <- sum(colMeans(meanf2f))/ncol(meanf2f)
+
+meanf2m <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(female == 0)
+meanf2m <- sum(colMeans(meanf2m))/ncol(meanf2m)
+
+meanm2f <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(female == 1)
+meanm2f <- sum(colMeans(meanm2f))/ncol(meanm2f)
+
+meanm2m <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(female == 0)
+meanm2m <- sum(colMeans(meanm2m))/ncol(meanm2m)
+
+means <- c(meanf2f, meanf2m, meanm2f, meanm2m)
+names <- c("female for female", "female for male", "male for female", "male for male")
+
+srednie <- data.frame(
+  zależności = names,
+  średnia = means
+)
+ggplot(srednie, aes(x = zależności, y = średnia)) +
+        geom_bar(stat = "identity", fill = "green", width = 0.5) +
+        labs(title = ' Zależność między płcią oceniającego a płcią ocenianego')
+
+# zwiazek z doswiadczeniem
+meanf2f <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(beauty_set_tidy$tenured == 1)
+meanf2f <- sum(colMeans(meanf2f))/ncol(meanf2f)
+
+meanf2m <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(beauty_set_tidy$tenured == 0)
+meanf2m <- sum(colMeans(meanf2m))/ncol(meanf2m)
+
+meanm2f <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(beauty_set_tidy$tenured == 1)
+meanm2f <- sum(colMeans(meanm2f))/ncol(meanm2f)
+
+meanm2m <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(beauty_set_tidy$tenured == 0)
+meanm2m <- sum(colMeans(meanm2m))/ncol(meanm2m)
+
+means <- c(meanf2f, meanf2m, meanm2f, meanm2m)
+names <- c("female for untenured", "female for tenured", "male for untenured", "male for tenured")
+
+srednie <- data.frame(
+  zależności = names,
+  średnia = means
+)
+ggplot(srednie, aes(x = zależności, y = średnia)) +
+        geom_bar(stat = "identity", fill = "red", width = 0.5) +
+        labs(title = ' Zależność między płcią oceniającego a doświadczeniem ocenianego')
+
+# zwiazek z mniejszoscia
+meanf2f <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(beauty_set_tidy$minority == 1)
+meanf2f <- sum(colMeans(meanf2f))/ncol(meanf2f)
+
+meanf2m <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, female) |> filter(beauty_set_tidy$minority == 0)
+meanf2m <- sum(colMeans(meanf2m))/ncol(meanf2m)
+
+meanm2f <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(beauty_set_tidy$minority == 1)
+meanm2f <- sum(colMeans(meanm2f))/ncol(meanm2f)
+
+meanm2m <- beauty_set_tidy |> select(beautymlowerdiv, beautymupperdiv, beautym2upper, female) |> filter(beauty_set_tidy$minority == 0)
+meanm2m <- sum(colMeans(meanm2m))/ncol(meanm2m)
+
+means <- c(meanf2f, meanf2m, meanm2f, meanm2m)
+names <- c("female for minority", "female for non-minority", "male for minority", "male for non-minority")
+
+srednie <- data.frame(
+  zależności = names,
+  średnia = means
+)
+ggplot(srednie, aes(x = zależności, y = średnia)) +
+        geom_bar(stat = "identity", fill = "orange", width = 0.5) +
+        labs(title = ' Zależność między płcią oceniającego a przynależnością do mniejszości ocenianego')
+```
+
+* kobiety oceniają lepiej, natomiast mężczyźni surowiej
+
+* obie płcie lepiej oceniają nauczycielki niż nauczycieli
+
+* osoby przynależące do mniejszości są oceniane nieco lepiej
+
+* osoby doświadczone otrzymują lepsze oceny
+
+### Czy wiek nauczyciela odgrywa rolę w ocenie jego urody?
+
+```{r pytanie_4}
+#  lacze rankingi i wyciagam sredni wzgledem wieku
+age_beauty <- beauty_set_tidy |> select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, beautymlowerdiv, beautymupperdiv, beautym2upper, age) |> 
+pivot_longer(cols = c(beautyflowerdiv, beautyfupperdiv, beautyf2upper, beautymlowerdiv, beautymupperdiv, beautym2upper), names_to = 'division', values_to = 'ratings') |>
+group_by(age) |>
+summarize(mean_rating = mean(ratings))
+
+ggplot(age_beauty, aes(x = age, y = mean_rating)) +
+    geom_point(size = 0.5) +
+    geom_line(color = "#9966CC") +
+    geom_smooth(linewidth=2, se=FALSE, color="red") +
+    labs(title = "Zależność oceny urody od wieku", x = "Wiek", y = "Ocena") +
+    xlim(25, 75) +
+    theme_minimal()
+```
+
+* Zauważono tendencję spadkową oceny urody w miarę przyrostu wieku nauczyciela
+
+### Czy wiek wpływa na ocenę nauczyciela lub kursu?
+
+```{r pytanie_5}
+age_ratings <- beauty_set_tidy |> select(profevaluation, courseevaluation, age) |> 
+group_by(age) |>
+summarize(mean_prof_rating = mean(profevaluation), mean_course_rating = mean(courseevaluation))
+
+ggplot(age_ratings, aes(x = age, y = mean_prof_rating)) +
+    geom_point(size = 0.5) +
+    geom_line(color = "99CCFF") +
+    geom_smooth(linewidth=2, se=FALSE, color="red") +
+    labs(title = "Zależność oceny nauczyciela od wieku", x = "Wiek", y = "Ocena") +
+    xlim(25, 75) +
+    theme_minimal()
+
+ggplot(age_ratings, aes(x = age, y = mean_course_rating)) +
+    geom_point(size = 0.5) +
+    geom_line(color = "99CCFF") +
+    geom_smooth(linewidth=2, se=FALSE, color="red") +
+    labs(title = "Zależność oceny kursu od wieku", x = "Wiek", y = "Ocena") +
+    xlim(25, 75) +
+    theme_minimal()
+
+
+```
+
+* Nie widać znaczącego wpływu oceny od wieku w obu przypadkach. Z niewielką różnicą, najlepiej wypadają osoby w przedziale wiekowym 45-55 lat.
+
+
+### Jaki jest związek między urodą nauczyciela a oceną kursu? Czy podział na grupy (zarówno ocenianjących jak też i nauczycieli ma na to jakiś wpływ)?
+
+```{r pytanie_6}
+beauty_courseeval <- beauty_set_tidy |>
+ select(beautyflowerdiv, beautyfupperdiv, beautyf2upper, beautymlowerdiv, beautymupperdiv, beautym2upper, female, courseevaluation) |> 
+ group_by(female) |>
+ pivot_longer(cols = c(beautyflowerdiv, beautyfupperdiv, beautyf2upper), names_to = NULL, values_to = "female_is_rating") |>
+ pivot_longer(cols = c(beautymlowerdiv, beautymupperdiv, beautym2upper), names_to = NULL, values_to = "male_is_rating") |>
+ pivot_longer(cols = c(female_is_rating, male_is_rating), names_to = "who_rating", values_to = "beauty_ratings") |>
+ mutate(female = ifelse(female == 0, "male", "female"))
+
+# glimpse(beauty_courseeval)
+ggplot(data = beauty_courseeval, aes(x = beauty_ratings , y = courseevaluation, color = beauty_ratings)) +
+geom_point() +
+facet_grid(female ~ who_rating) + 
+scale_colour_gradient2(low = 'orange', mid = 'red', high = 'brown')
+
+```
+
+* Na podstawie utworzonych podwykresów widać zależności pomiędzy płcią która ocenia, płcią ocenianą, oceną urody i oceną kursu.
+
+* Widać zależności pomiędzy płciami: Gdy kobieta ocenia mężczyznę, oraz gdy mężczyzna kobietę, przy wysokich ocenach urody ocena za kurs jest wysoka.
+
+* Powyżej opisana zależność istnieje także przy ocenie tej samej płci; bardziej widoczna między kobietami, mniej między mężczyznami
+
+* Przy średnich oraz niskich ocenach urody nie zaobserwowano wpływu na ocenę kursu
+

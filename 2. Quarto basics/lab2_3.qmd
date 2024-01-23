@@ -1,0 +1,14 @@
+---
+title: "Zadanie Domowe. Prezentacja powerpoint z jednym slajdem z tekstem i jednym obrazkiem z internetu"
+author: "Gabriel Szewczyk"
+format: 
+  pptx:
+    fontsize: 18pt
+editor: visual
+---
+
+## opis taczek
+ **Taczki** - mały wózek z jednym kołem, częściowo unoszony ręcznie, używany do transportu przedmiotów lub materiałów sypkich na niewielkich odległościach. Taczki wyposażone są w dwa uchwyty, przy pomocy których są unoszone i pchane, rzadziej ciągnięte, przez człowieka[1]. Wykonywane są z drewna, metalu, plastiku lub kombinacji tych materiałów. Znajdują szerokie zastosowanie w ogrodnictwie i na placach budowy.
+
+## prezentacja taczek
+![taczki](taczki.jpg){width=300}

@@ -1,0 +1,166 @@
+---
+title: "Zadanie 6. Wprowadzenie do tidyverse"
+author: "Gabriel Szewczyk"
+date: 11.23.2023
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+<!-- > to strzalka -->
+<!-- x %>% sin() %>% cos() - wrapowanie funkcji--> 
+
+### Załadowanie paczek
+przez fakt identycznych nazw funkcji sortowania data.frame'ów w paczce za pomocą biblioteki 'conflicted' wybrałem paczki które należy traktować jako pierwsze domyślne.
+
+zobrazowanie przykładowej pierwszego wiersza danych z bazy nycflights13
+```{r load, warning = FALSE}
+library(tidyverse)
+library(nycflights13)
+fl <- flights
+fl[1,]
+```
+
+### Zadanie 1.
+Korzystając z dokumentacji pakietu i podglądając zawartość tabeli opisać co znaczą wszystkie zmienne oraz jakich są typów. Wyjaśnić też co oznaczają poszczególne kody.
+
+```{r flights}
+
+wyniki <- data.frame(nazwa_kolumny = character(), typ_danych = character(), stringsAsFactors = FALSE)
+for (kolumna in names(fl)) {
+  datatype <- typeof(fl[[kolumna]])
+  wyniki <- rbind(wyniki, data.frame(nazwa_kolumny = kolumna, typ_danych = datatype, stringsAsFactors = FALSE))
+}
+wyniki
+
+```
+
+To samo zadanie można było zrealizowac za pomocą funkcji __glimpse()__
+
+### Zadanie 2.
+Za pomocą pojedynczego pipelina na każdy warunek, znajdź wszystkie loty, które:\
+
+* Miały opóźnienie o co najmniej 2 godziny.
+
+```{r opoznienie 2h}
+opoznienie_120 <- fl |> filter(dep_delay >= 120)
+cat("Ilość lotów opóźnionych o min. 2 godziny: ", nrow(opoznienie_120))
+```
+
+Podałem ilość tych lotów nie wypisując ich, ponieważ było ich za wiele.<br />
+- *dep_delay oznaczajacy opoznienie jest podany w minutach*<br />
+- *czasy odlotów rzeczywistych i planowanych są podane integerem, w którym to 2 cyfry od prawej oznaczaja minute, pozostale godzine*<br /><br />
+
+* **Leciały do Huston (IAH lub HOU)**
+
+```{r huston}
+huston <- fl |> filter(dest == 'IAH' | dest == 'HOU')
+cat("Ilość lotów w kierunku Huston: ", nrow(huston))
+```
+
+* **Były z lini lotniczych United, American, lub Delta**
+
+```{r linie lotnicze}
+carriers <- fl |> distinct(carrier)
+cat("rodzaje przewoźników")
+carriers
+```
+
+*wspomagając się danymi z internetu, United ma skrót UA, American - AA, natomiast delta - DL*
+
+```{r linie lotnicze 2}
+uad <- fl |> filter(carrier == 'UA' | carrier == 'AA' | carrier == 'DL')
+cat("Ilość lotów zrealizowanych przez United, American lub delta: ", nrow(uad))
+```
+
+* **Wylatywały w lecie (Lipiec, Sierpień, Wrzesień)**
+
+```{r loty lato}
+summer <- fl |> filter(month == 7 | month == 8 | month == 9)
+cat("Ilość lotów zrealizowanych w lecie: ", nrow(summer))
+```
+
+* **Miały opóźnienie o co najmniej dwie godziny ale nie miały opóźnienia odlotu.**
+
+```{r opoznienie ale dobry odlot}
+arr_delay_wo_dep_delay <- fl |> filter(arr_delay >= 120 & dep_delay == 0)
+cat("Ilość lotów z opóźnieniem min. 2godzinnym, lecz ze startem na czas: ", nrow(arr_delay_wo_dep_delay))
+```
+
+* **Miały co najmniej godzinę opóźnienia ale odrobiły ponad 30 minut w trakcie lotu.**
+
+```{r nadrobione}
+made_up_during_flight <- fl |> filter((dep_delay >= 60) & (dep_delay-arr_delay < 30))
+cat("Ilość lotów z godzinnym opóźnieniem wylotu, lecz opóźnieniem przylotu o ponad pół godziny mniejszym: ", nrow(made_up_during_flight))
+```
+
+* **Posortuj loty by znaleźć loty z najdłuższym opóźnieniem odlotu. Znajdź loty, który odlatywały najwcześniej rano.**
+
+```{r najwczesniej rano}
+
+sorted_del <- fl |> arrange(desc(dep_delay))
+first_10_del <- head(sorted_del, 10)
+cat('10 wyników z największym opóźnieniem odlotu')
+first_10_del
+
+sorted_early <- fl |> arrange(sched_dep_time, dep_time, dep_delay)
+first_10_early <- head(sorted_early, 10)
+cat('10 najwcześniejszych odlotów(wszystkie o 0:01), posortowane najmniejszym opoznieniem')
+first_10_early
+```
+
+*Musiałem oddzielić oba przypadki (najdłuższe opóźnienie, najwcześniej rano), ponieważ nie dostrzegłem koorelacji między nimi. Posortowane przez najdłuższe opóźnienie, gdzie każde się różniło, sprawiało że sortowanie przez najwcześniej rano nic nie zmieniało.*
+
+### Zadanie 3.
+**Posortuj loty by znaleźć najszybsze połączenia.**
+*Najszybsze połączenia względem czasu lotu, drugorzędnie różnicy planowanego odlotu i przylotu*
+
+```{r najszybsze polaczenia}
+fastest <- fl |> mutate(sched_air_time = sched_arr_time - sched_dep_time) |> arrange(air_time, sched_air_time)
+first_10_fastest <- head(fastest, 10)
+cat('Najszybsze połączenia:')
+first_10_fastest
+```
+
+### Zadanie 4.
+**Czy każdego dnia 2013 odbył się co najmniej jeden lot?**
+
+```{r 2013 loty}
+flights_data <- fl |> filter(year == 2013) |> mutate(date = paste(month, day, '2013', sep = "-"))
+# scalam miesiac i dzien z roku 2013 w jedna kolumne data
+
+daily_flights_summary <- flights_data |> arrange(date) |> summarise(any_flight = n() > 0) |> filter(!any_flight)
+# tworze ramke danych z kolumna daty oraz warunkiem czy jakikolwiek lot odbyl sie tego dnia
+cat("Tabeka z datami, których nie odbł się żaden lot:")
+daily_flights_summary
+
+```
+
+*W 2013 nie było dnia w którym żaden lot by się nie odbył.*
+
+### Zadanie 5.
+**Które loty pokonały największy dystans a które najkrótszy?**
+
+```{r dystans}
+length_of_flight <- fl |> arrange(desc(distance))
+longest <- head(length_of_flight, 10)
+shortest <- tail(length_of_flight, 10)
+
+cat('Najdłuższe loty względem dystansu:')
+longest
+
+cat('Najkrótsze loty względem dystansu:')
+shortest
+```
+
+### Zadanie 6.
+**Czy kolejność używania filter() i arrange() ma znaczenie jeśli używasz obydwu? Dlaczego tak/nie? Weź pod uwagę zarówno rezultaty jak też i zużycie zasobów.**
+
+*Ma znaczenie, pierwszorzędnie to widać biorąc pod uwagę zużycie zasobów. Wybierając początkowo funkcję filter(), od razu pracujemy na mniejszym zbiorze danych, przez co arrange() ma mniejszą ilość danych do posortowania i optymalizuje to czas wykonania.*<br /><br />
+*Zamieniając kolejność, początkowo sortując ramkę danych, dane są sortowane przed zastosowaniem filtra, co zmieni kolejność przefiltrowanych wyników.*

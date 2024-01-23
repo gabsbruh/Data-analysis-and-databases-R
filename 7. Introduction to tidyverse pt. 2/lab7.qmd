@@ -1,0 +1,222 @@
+---
+title: "Zadanie 7.. Wprowadzenie do tidyverse cz. 2"
+author: "Gabriel Szewczyk"
+date: 11.29.2023
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+<!-- > to strzalka -->
+<!-- x %>% sin() %>% cos() - wrapowanie funkcji--> 
+
+## Załadowanie paczek
+przez fakt identycznych nazw funkcji sortowania data.frame'ów w paczce za pomocą biblioteki 'conflicted' wybrałem paczki które należy traktować jako pierwsze domyślne.
+```{r load, warning = FALSE}
+library(readr)
+library(tidyverse)
+library(nycflights13)
+```
+
+## Utworzenie zbiorów danych
+- *zbiór danych sales_data ze sprzedażą wg produktów i kwartałów*
+- *zbiór danych sales_data poszerzony o 6 dodatkowych kategorii*
+```{r tworzenie danych}
+# Utwórz przykładowe dane
+
+# pierwszy dataset
+set.seed(15*101) # zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+kwartały <- c("Q1", "Q2", "Q3", "Q4")
+
+sales_data <- data.frame(
+  Produkt = rep(produkty, each = length(kwartały)),
+  Q1 = sample(100:500, 12),
+  Q2 = sample(100:500, 12),
+  Q3 = sample(100:500, 12),
+  Q4 = sample(100:500, 12)
+)
+
+
+
+# drugi dataset
+set.seed(15*101) # zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+sklepy <- c("Sklep_X", "Sklep_Y", "Sklep_Z")
+miesiace <- c("Styczeń", "Luty", "Marzec")
+
+sales_data_advanced <- data.frame(
+  Produkt = rep(produkty, each = length(sklepy) * length(miesiace)),
+  Sklep = rep(sklepy, times = length(produkty) * length(miesiace)),
+  Miesiac = rep(miesiace, each = length(produkty) * length(sklepy)),
+  Sprzedaz = sample(100:500, 27),
+  Koszty = sample(30:200, 27),
+  Zysk = NA
+)
+sales_data_advanced$Zysk <- sales_data_advanced$Sprzedaz - sales_data_advanced$Koszty
+```
+
+## Analiza zbioru danych sales_data
+
+**Wyświetlenie orginalnego dataframe'u**
+```{r }
+sales_data
+```
+
+1. **Zmieniam format za pomocą funkcji pivot_longer()**
+```{r pivot_longer}
+sales_data_2 <- sales_data  |> pivot_longer(col = !Produkt, names_to="Kwartal", values_to="Sprzedaz")
+```
+
+2. **Stwórz tabelę podsumowującą, która pokaże całkowitą sprzedaż dla każdego produktu we wszystkich kwartałach. Możesz użyć funkcji group_by() i summarize() z pakietu dplyr.**
+
+```{r sprzedaz_kwartalami}
+sales_data_3 <- sales_data_2 |> group_by(Produkt, Kwartal) |> summarize(calkowita_sprzedaz = sum(Sprzedaz), .groups=('drop'))
+sales_data_3
+```
+
+3. **Teraz użyj funkcji pivot_wider() do przywrócenia danych w formacie szerokim.**
+
+```{r pivot_wider}
+sales_data_back <- sales_data_3 |> pivot_wider(names_from = Kwartal, values_from = calkowita_sprzedaz)
+sales_data_back
+```
+
+## Analiza zbioru danych sales_data_advanced
+1. **Filtrowanie danych: Wybierz tylko te rekordy, gdzie zysk jest dodatni.**
+
+```{r dodatni_zysk}
+positive_profit <- sales_data_advanced |> filter(Zysk>0)
+positive_profit
+```
+
+2. **Sortowanie danych: Posortuj dane według malejącego zysku, a następnie według nazw produktów rosnąco.**
+
+```{r malejacy_zysk}
+sorted <- sales_data_advanced |> arrange(desc(Zysk), Produkt)
+sorted
+```
+
+3. **Tworzenie nowych kolumn: Dodaj kolumnę Marza_Procentowa, która będzie zawierała procentową marżę zysku dla każdego rekordu.**
+
+```{r marza}
+margin <- sorted |> mutate(Marza_Procentowa = (Zysk/(Sprzedaz+Koszty))*100) |> mutate(Marza_Procentowa = paste0(round(Marza_Procentowa, 2), "%"))
+margin
+```
+
+4. **Agregacja danych: Stwórz tabelę, która pokaże średnią sprzedaż, koszty i zysk dla każdego sklepu.**
+
+```{r nowa_tabela}
+new_tab <- margin |>
+           group_by(Sklep) |> 
+           summarise(avg_sprzedaz = round(mean(Sprzedaz),0),avg_koszty = round(mean(Koszty),0), avg_zysk = round(mean(Zysk),0))
+new_tab
+```
+
+5. **Pivotowanie danych: Przekształć dane w taki sposób, aby w jednym wierszu były informacje o sprzedaży, kosztach i zysku dla danego produktu w danym sklepie w danym miesiącu.**
+
+```{r scalanie_wierszow}
+sorted
+```
+
+*Mam problem ze zrozumieniem polecenia zadania - patrząc na jego opis, nie widzę różnicy względem pierwotnego zbioru danych, ponieważ w każdym wierszu znajdują się takie same dane jakie wymaga od nas to zadanie.*
+
+6. **Dodatkowe przekształcenie danych: Dodaj nową kolumnę Koszty_na_Sprzedaz reprezentującą procentowy udział kosztów w sprzedaży.**
+
+```{r koszty_na_sprzedaz}
+koszty <- sorted |> mutate(Koszty_na_Sprzedaz = round((Koszty/Sprzedaz)*100, 2))
+koszty
+```
+
+7. **Powrót do szerokiego formatu: Przekształć dane tak, aby wrócić do pierwotnego formatu, gdzie każdy wiersz reprezentuje produkt w danym sklepie w danym miesiącu.**
+
+```{r pivot_wider__}
+koszty
+```
+
+*Nie wykonałem polecenia 6. którego nie zrozumiałem, więc domniemuję że nie zmieniam nic.*
+
+8. **Zaawansowane wybieranie danych: Wybierz rekordy z największymi kosztami na sprzedaż dla każdego produktu.**
+
+
+```{r najwieksze_koszty}
+max_by_prod <- koszty |> group_by(Produkt) |> slice_max(Koszty_na_Sprzedaz)
+max_by_prod
+```
+
+## Analiza zbioru danych flights
+1. Określ, który przewoźnik ma największe opóźnienia przylotu? 
+
+```{r dodaj_bl}
+fl <- flights
+carrier_delays <- fl |> filter(!is.na(arr_delay)) |> group_by(carrier) |> summarize(avg_arr_delay = round(mean(arr_delay), 2), .groups='drop') |> arrange(desc(avg_arr_delay))
+carrier_delays
+
+cat("F9 ma największe opóźnienia ze średnią 21.92 minuty na jeden lot.")
+
+
+```
+
+*Podglądając przebieg zmiennych nie wygląda na to aby opóźnienia miały związek także z lotniskiem docelowym, dane te są zbyt mało skoorelowane by można było to dostrzec gołym okiem.*
+
+*Musiałem dodatkowo usunąć rekordy zwierające nieokreśloną ilość opóźnienia, ponieważ funkcja mean nie działała przy nich poprawnie.*
+
+2. Znajdź loty, które są najbardziej opóźnione przy odlocie z każdego lotniska.
+
+```{r najb_opoznione }
+#| warning: false
+airport_delay <- fl |> 
+  filter(!is.na(arr_delay)) |> 
+  group_by(origin, flight) |> 
+  summarise(origin = origin, destination = dest, flight =   flight, avg_dep_delay = mean(dep_delay), .groups='drop') |> 
+  group_by(origin) |>
+  slice_max(avg_dep_delay,n=1)
+
+# przed kazda operacja podaje group by wzgledem czego chce grupowac
+airport_delay
+
+
+```
+
+*założyłem, że kolumna flight odpowiada za numer lotu przez co mogłem pogrupować loty.*
+
+## Analiza zbioru danych z listy Billboardu.
+1. **Wczytaj zbiór danych za pomocą funkcji read_csv()**
+
+```{r read_csv}
+billboard <- read_csv("billboard.csv")
+```
+
+
+2. **Sporządź tabelę zawierającą wszystkie piosenki, które spadły z listy we wrześniu 2000.**
+
+*Nie będzie to takie proste, ponieważ mam jedynie podaną datę wejścia oraz serię tygodni, jakie miejsce zajmował utwór. 'NA' oznacza że utworu już nie ma, więc muszę znaleźć po ilu dniach utwory opuściły playlistę, następnie dodać do daty wejścia na billboard i sprawdzić czy data zawiera się we wrześniu.*
+
+```{r spadly_z_listy}
+fallen <- billboard |> 
+select(track, date.entered)|> 
+mutate(days_on_list = 7 * apply(billboard[,8:length(billboard[1,])], MARGIN=1, function(x) sum(!is.na(x)))) |> 
+mutate(date_dropped = date.entered + days_on_list) |> 
+filter(date_dropped >= as.Date("2000-09-01") & date_dropped <= as.Date("2000-09-30")) |>
+arrange(date_dropped)
+
+
+fallen
+
+```
+
+3. **Określ, która z piosenek danego gatunku była na liście najdłużej.**
+
+*Obliczam długość dni liście billboardu, grupuje wzgledem gatunku, i wykonuje filtracje po dlugosci. W przypadku gdy rekordowe utwory byly po tyle samo dni zostawiam wszystkie*
+```{r najdluzej_bilboard}
+longest_on_billboard <- billboard |> select(track, genre, date.entered) |> mutate(days_on_list = 7 * apply(billboard[,8:length(billboard[1,])], MARGIN=1, function(x) sum(!is.na(x)))) |> group_by(genre) |> filter(days_on_list == max(days_on_list, na.rm=TRUE)) |> arrange(genre)
+
+
+longest_on_billboard
+```
