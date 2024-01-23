@@ -4,7 +4,7 @@ This repository contains all my solutions of tasks given on the course Data Anal
 Here is the syllabus of the course [link]
 
 **List of lab topics:**
-  * Introduction to R
+  * [Introduction to R](01.Introduction to R)
   * Quarto basics
   * Connecting to the database and *select* statement
   * Joining tables and subqueries
