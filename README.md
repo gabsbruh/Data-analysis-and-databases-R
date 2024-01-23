@@ -4,16 +4,16 @@ This repository contains all my solutions of tasks given on the course Data Anal
 Here is the syllabus of the course [link]
 
 **List of lab topics:**
-  * Introduction to R
-  * Quarto basics
-  * Connecting to the database and *select* statement
-  * Joining tables and subqueries
-  * Strings and regular expressions
-  * Introduction to Tidyverse
-  * Introduction to Tidyverse pt. 2
+  * ([01.Introduction to R](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/01.%20Introduction%20to%20R))
+  * [Quarto basics](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/02.%20Quarto%20basics)
+  * [Connecting to the database and *select* statement](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/03.%20Connecting%20to%20the%20database%20and%20select%20statement)
+  * [Joining tables and subqueries](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/04.%20Joining%20tables%20and%20subqueries)
+  * [Strings and regular expressions](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/05.%20Strings%20and%20regular%20expressions)
+  * [Introduction to Tidyverse](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/06.%20Introduction%20to%20tidyverse)
+  * [Introduction to Tidyverse pt. 2](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/07.%20Introduction%20to%20tidyverse%20pt.%202)
   * Introduction to Ggplot2
-  * Creating tables in databases
-  * Data mining
-  * Linear models
-  * Data loading
+  * [Creating tables in databases](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/09.%20Creating%20tables%20in%20databases)https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/09.%20Creating%20tables%20in%20databases
+  * [Data mining](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/10.%20Data%20Mining)https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/10.%20Data%20Mining
+  * [Linear models](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/11.%20Linear%20models)https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/11.%20Linear%20models
+  * [Data loading](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/12.%20Data%20Loading)https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/12.%20Data%20Loading
     
