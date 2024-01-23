@@ -1,0 +1,205 @@
+---
+title: "Zadanie 8. Wprowadzenie do ggplot2"
+author: "Gabriel Szewczyk"
+date: 12.05.2023
+format: 
+  html:
+    page-layout: full
+    code-fold: false
+    code-tools: true
+    code-line-numbers: true
+    fontsize: 18pt
+    df-print: kable
+editor: visual
+---
+
+## Załadowanie paczek i zbioru danych
+
+```{r load, warning=FALSE}
+library(tidyverse)
+patients <- read_tsv("patient-data-cleaned.txt")
+show_example <- head(patients,3)
+show_example
+```
+
+## Wykresy punktowe (scatterplot)
+
+1. Narysuj wykres punktowy wagi pacjenta w funkcji BMI (w estetyce globalnej) i pokoloruj punkty w oparciu o wzrost (w estetyce lokalnej).
+
+```{r BMI}
+ggplot(data = patients,
+        mapping = aes(x = Weight, y = BMI, color = Height)
+        ) +
+        geom_point()
+```
+
+2. Za pomocą dodatkowego geoma dopasuj gładką linię określającą trend.
+
+```{r trend, warning = FALSE}
+ggplot(data = patients,
+        mapping = aes(x = Weight, y = BMI, color = Height)
+        ) +
+        geom_point() +
+        geom_smooth(method = 'lm')
+```
+
+3. Czy dopasowanie z poprzedniego wykresu wygląda dobrze? Spójrz na stronę pomocy dla geom_smooth i dostosuj metodę tak, aby pasowała do linii prostej i nie rysowała przedziału ufności.
+
+```{r smooth}
+ggplot(data = patients,
+        mapping = aes(x = Weight, y = BMI, color = Height)
+        ) +
+        geom_point() +
+        geom_smooth(method = 'lm', se=FALSE)
+```
+
+## Wykresy pudełkowe
+
+1. Wygeneruj wykres pudełkowy zmiennej Score porównując palaczy i niepalących
+
+```{r boxplot}
+ggplot(data = patients,
+        mapping = aes(x = Smokes, y = Score)
+        ) +
+        geom_boxplot()
+```
+
+2. Za pomocą kolorów rozdziel wykresy pudełkowe dodatkowo ze względu na płeć.
+
+```{r divide_boxes}
+ggplot(data = patients,
+        mapping = aes(x = Smokes, y = Score, fill=Sex)
+        ) +
+        geom_boxplot() +
+        scale_fill_manual(values = c("red", "blue")) +
+        labs(title = 'Wykres pudełkowy w oparciu o płeć')
+```
+
+## Histogramy i estymatory jądrowe
+
+1. Wygeneruj histogram BMI kolorując każdy słupek na niebiesko. Dobierz odpowiednią szerokość przedziałów (binów). Swój wybór uzasadnij.
+
+```{r bar_chart, warning = FALSE}
+ggplot(data = patients,
+        mapping = aes(x = BMI)
+        ) +
+        geom_histogram(fill = "blue", binwidth = 1)
+```
+
+2. Zamiast histogramu wygeneruj wykres estymatora jądrowego.
+
+```{r kernel}
+ggplot(data = patients, mapping = aes(x=BMI)) +
+geom_density()
+```
+
+3. Porównaj histogram z estymatorem jądrowym na jednym wykresie. Ustaw przeźroczystość histogramu (alpha) na 20%. Dlaczego wysokości wykresów są różne? Ustaw estetykę globalną wykresu tak, aby ujednolicić pionową oś (wskazówka: użyj funkcji after_stat() z odpowiednim argumentem)
+
+```{r kernel_compare}
+# TODO
+ggplot(data = patients,
+        mapping = aes(x = BMI), after_stat) +
+        geom_histogram(aes(y = after_stat(density)), fill = "blue", binwidth = 1, alpha = 0.2) +
+        geom_density()       
+```
+
+*Wartości wykresów są różne, ponieważ estymator jądrowy to funkcja gęstości prawdopodobieństwa której całka jest równa 1.*
+
+4. Wygeneruj wykresy estymatorów jądrowych BMI pokolorowane ze względu na płeć (kolor wypełnienia). Dobierz odpowiednią przeźroczystość.
+
+```{r kernel_charts}
+ggplot(data = patients, mapping = aes(x = BMI, fill = Sex)) +
+geom_density(aes(fill=Sex), alpha = 0.2)
+```
+
+## Kafelki
+
+1. Narysuj wykres punktowy wagi pacjenta w funkcji BMI i pokoloruj punkty w oparciu o wzrost. Podziel go na siatkę wykresów (kafelki) w oparciu o płeć i palenie papierosów.
+
+```{r weight_to_bmi}
+ggplot(data = patients, mapping = aes(x = BMI, y = Weight, color = Height)) +
+geom_point() +
+facet_grid(Sex ~ Smokes)
+```
+
+2. Wygeneruj wykres pudełkowy BMI porównując palących i niepalących, pokolorowanych ze względu na płeć i dodaj osobny kafelek ze względu na wiek.
+
+```{r box_chart_bmi}
+ggplot(data = patients, mapping = aes(x = Smokes, y = BMI, fill = Sex)) +
+geom_boxplot() +
+facet_wrap(~ Age)
+```
+
+3. Utwórz podobny boxplot BMI, ale tym razem pogrupuj dane ze względu na płeć, pokoloruj ze względu na wiek (wskazówka:przekształć kolor do zmiennej kategorycznej) a kafelki ze względu na to kto jest osobą palącą.
+
+```{r boxplot_bmi, warning = FALSE}
+ggplot(data = patients, mapping = aes(x = Sex, y = BMI, fill = Age)) +
+geom_boxplot() +
+facet_wrap(~ Smokes)
+```
+
+## Skale
+
+1. Narysuj wykres punktowy wagi pacjenta w funkcji BMI.
+
+```{r point_weight_bmi}
+ggplot(data = patients, mapping = aes(x = Weight, y = BMI)) +
+geom_point()
+```
+
+2. Zaczynając od poprzedniego wykresu dostosuj oś BMI tak aby zaznaczone byly tylko wartości 20, 30, 40 a na osi wagi wartości od 60 do 100 ze skokiem 5. Dodaj polską nazwę zmiennej i jednostkę (kg).
+
+```{r bmi_axis}
+ggplot(data = patients, mapping = aes(x = BMI, y = Weight)) +
+geom_point() +
+scale_x_continuous(breaks = c(20, 30, 40)) +
+scale_y_continuous(breaks = c(60, 100, by = 5),
+name = "Weight [kg]")
+```
+
+3. Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Utwórz skalę kolorystyczną z punktem środkowym odpowiadającym średniemu wzrostowi pacjenta zaś ekstremami skali mają być zielony (minimum) i czerwony (maksimum) w odcieniach zgodnych z kolorami AGH. Jako środkowy kolor przyjąć szarość grey
+
+```{r points_weight}
+ggplot(data = patients, mapping = aes(x = BMI, y = Height, colour = Height)) + 
+geom_point() +
+scale_colour_gradient2(low = "green", high = "red", mid = "grey", midpoint = mean(patients$Height))
+```
+
+## Motywy
+
+1. Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Dodaj do niego linie trendu bez przedziałów ufności dla każdej z grup wiekowych
+
+```{r themes_1, warning=FALSE}
+ggplot(data = patients, mapping = aes(x = BMI, y = Weight, colour = Age)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+2. Usuń tytuł legendy. Zmień kolory tła pozycji legendy (key) na biało i umieść legendę pod wykresem.
+
+```{r themes_2, warning=FALSE}
+ggplot(data = patients, mapping = aes(x = BMI, y = Weight, colour = Age)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme(
+    legend.title = element_blank(),
+    legend.key = element_rect(fill = "white"),
+    legend.position = "bottom"
+  )
+```
+
+3. Dodaj odpowiedni tytuł do wykresu. Usuń pomniejsze linie siatki. Zapisz jako plik png o wymiarach 16 na 16 cm.
+
+```{r themes_3, warning=FALSE}
+ggplot(data = patients, mapping = aes(x = BMI, y = Weight, colour = Age)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme(
+    legend.title = element_blank(),
+    legend.key = element_rect(fill = "white"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "BMI w stosunku do wagi")
+ggsave("BMI_a_Waga.png", units = "in", height = 16, width = 16)
+```

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Szewczyk">
+<meta name="dcterms.date" content="2023-12-05">
+
+<title>Zadanie 8. Wprowadzenie do ggplot2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab8_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab8_files/libs/quarto-html/quarto.js"></script>
+<script src="lab8_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab8_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab8_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab8_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab8_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab8_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab8_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab8_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full">
+
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Zadanie 8. Wprowadzenie do ggplot2</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Gabriel Szewczyk </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 5, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="załadowanie-paczek-i-zbioru-danych" class="level2">
+<h2 class="anchored" data-anchor-id="załadowanie-paczek-i-zbioru-danych">Załadowanie paczek i zbioru danych</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>patients <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"patient-data-cleaned.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 100 Columns: 15
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (5): ID, Name, Sex, Smokes, State
+dbl  (6): Height, Weight, Grade, Score, Age, BMI
+lgl  (2): Died, Overweight
+date (2): Birth, Date.Entered.Study
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>show_example <span class="ot">&lt;-</span> <span class="fu">head</span>(patients,<span class="dv">3</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>show_example</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 3%">
+<col style="width: 8%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 14%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">ID</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Sex</th>
+<th style="text-align: left;">Smokes</th>
+<th style="text-align: right;">Height</th>
+<th style="text-align: right;">Weight</th>
+<th style="text-align: left;">Birth</th>
+<th style="text-align: left;">State</th>
+<th style="text-align: right;">Grade</th>
+<th style="text-align: left;">Died</th>
+<th style="text-align: right;">Score</th>
+<th style="text-align: left;">Date.Entered.Study</th>
+<th style="text-align: right;">Age</th>
+<th style="text-align: right;">BMI</th>
+<th style="text-align: left;">Overweight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AC/AH/001</td>
+<td style="text-align: left;">Michael</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Non-Smoker</td>
+<td style="text-align: right;">182.87</td>
+<td style="text-align: right;">76.57</td>
+<td style="text-align: left;">1972-02-06</td>
+<td style="text-align: left;">Georgia</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: left;">2015-12-01</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">22.90</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AC/AH/017</td>
+<td style="text-align: left;">Derek</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Non-Smoker</td>
+<td style="text-align: right;">179.12</td>
+<td style="text-align: right;">80.43</td>
+<td style="text-align: left;">1972-06-15</td>
+<td style="text-align: left;">Colorado</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">-1.31</td>
+<td style="text-align: left;">2015-12-01</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">25.07</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AC/AH/020</td>
+<td style="text-align: left;">Todd</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: left;">Non-Smoker</td>
+<td style="text-align: right;">169.15</td>
+<td style="text-align: right;">75.48</td>
+<td style="text-align: left;">1972-07-09</td>
+<td style="text-align: left;">New Jersey</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">-0.17</td>
+<td style="text-align: left;">2015-12-01</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">26.38</td>
+<td style="text-align: left;">TRUE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="wykresy-punktowe-scatterplot" class="level2">
+<h2 class="anchored" data-anchor-id="wykresy-punktowe-scatterplot">Wykresy punktowe (scatterplot)</h2>
+<ol type="1">
+<li>Narysuj wykres punktowy wagi pacjenta w funkcji BMI (w estetyce globalnej) i pokoloruj punkty w oparciu o wzrost (w estetyce lokalnej).</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>        <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/BMI-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Za pomocą dodatkowego geoma dopasuj gładką linię określającą trend.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb7-2"><a href="#cb7-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb7-3"><a href="#cb7-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>        <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/trend-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Czy dopasowanie z poprzedniego wykresu wygląda dobrze? Spójrz na stronę pomocy dla geom_smooth i dostosuj metodę tak, aby pasowała do linii prostej i nie rysowała przedziału ufności.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb9-3"><a href="#cb9-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>        <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>, <span class="at">se=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The following aesthetics were dropped during statistical transformation: colour
+ℹ This can happen when ggplot fails to infer the correct grouping structure in
+  the data.
+ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+  variable into a factor?</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/smooth-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="wykresy-pudełkowe" class="level2">
+<h2 class="anchored" data-anchor-id="wykresy-pudełkowe">Wykresy pudełkowe</h2>
+<ol type="1">
+<li>Wygeneruj wykres pudełkowy zmiennej Score porównując palaczy i niepalących</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> Score)</span>
+<span id="cb12-3"><a href="#cb12-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>        <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/boxplot-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Za pomocą kolorów rozdziel wykresy pudełkowe dodatkowo ze względu na płeć.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb13-2"><a href="#cb13-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> Score, <span class="at">fill=</span>Sex)</span>
+<span id="cb13-3"><a href="#cb13-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>        <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>        <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Wykres pudełkowy w oparciu o płeć'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/divide_boxes-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="histogramy-i-estymatory-jądrowe" class="level2">
+<h2 class="anchored" data-anchor-id="histogramy-i-estymatory-jądrowe">Histogramy i estymatory jądrowe</h2>
+<ol type="1">
+<li>Wygeneruj histogram BMI kolorując każdy słupek na niebiesko. Dobierz odpowiednią szerokość przedziałów (binów). Swój wybór uzasadnij.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb14-2"><a href="#cb14-2"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI)</span>
+<span id="cb14-3"><a href="#cb14-3"></a>        ) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>        <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">binwidth =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/bar_chart-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Zamiast histogramu wygeneruj wykres estymatora jądrowego.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>BMI)) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">geom_density</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/kernel-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Porównaj histogram z estymatorem jądrowym na jednym wykresie. Ustaw przeźroczystość histogramu (alpha) na 20%. Dlaczego wysokości wykresów są różne? Ustaw estetykę globalną wykresu tak, aby ujednolicić pionową oś (wskazówka: użyj funkcji after_stat() z odpowiednim argumentem)</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># </span><span class="al">TODO</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI), after_stat) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>        <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>        <span class="fu">geom_density</span>()       </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/kernel_compare-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><em>Wartości wykresów są różne, ponieważ estymator jądrowy to funkcja gęstości prawdopodobieństwa której całka jest równa 1.</em></p>
+<ol start="4" type="1">
+<li>Wygeneruj wykresy estymatorów jądrowych BMI pokolorowane ze względu na płeć (kolor wypełnienia). Dobierz odpowiednią przeźroczystość.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">fill =</span> Sex)) <span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">fill=</span>Sex), <span class="at">alpha =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/kernel_charts-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="kafelki" class="level2">
+<h2 class="anchored" data-anchor-id="kafelki">Kafelki</h2>
+<ol type="1">
+<li>Narysuj wykres punktowy wagi pacjenta w funkcji BMI i pokoloruj punkty w oparciu o wzrost. Podziel go na siatkę wykresów (kafelki) w oparciu o płeć i palenie papierosów.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">color =</span> Height)) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">facet_grid</span>(Sex <span class="sc">~</span> Smokes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/weight_to_bmi-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Wygeneruj wykres pudełkowy BMI porównując palących i niepalących, pokolorowanych ze względu na płeć i dodaj osobny kafelek ze względu na wiek.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> BMI, <span class="at">fill =</span> Sex)) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="fu">facet_wrap</span>(<span class="sc">~</span> Age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/box_chart_bmi-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Utwórz podobny boxplot BMI, ale tym razem pogrupuj dane ze względu na płeć, pokoloruj ze względu na wiek (wskazówka:przekształć kolor do zmiennej kategorycznej) a kafelki ze względu na to kto jest osobą palącą.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Sex, <span class="at">y =</span> BMI, <span class="at">fill =</span> Age)) <span class="sc">+</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="fu">facet_wrap</span>(<span class="sc">~</span> Smokes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/boxplot_bmi-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="skale" class="level2">
+<h2 class="anchored" data-anchor-id="skale">Skale</h2>
+<ol type="1">
+<li>Narysuj wykres punktowy wagi pacjenta w funkcji BMI.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI)) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/point_weight_bmi-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Zaczynając od poprzedniego wykresu dostosuj oś BMI tak aby zaznaczone byly tylko wartości 20, 30, 40 a na osi wagi wartości od 60 do 100 ze skokiem 5. Dodaj polską nazwę zmiennej i jednostkę (kg).</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight)) <span class="sc">+</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>)) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
+<span id="cb22-5"><a href="#cb22-5"></a><span class="at">name =</span> <span class="st">"Weight [kg]"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/bmi_axis-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Utwórz skalę kolorystyczną z punktem środkowym odpowiadającym średniemu wzrostowi pacjenta zaś ekstremami skali mają być zielony (minimum) i czerwony (maksimum) w odcieniach zgodnych z kolorami AGH. Jako środkowy kolor przyjąć szarość grey</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Height, <span class="at">colour =</span> Height)) <span class="sc">+</span> </span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="fu">scale_colour_gradient2</span>(<span class="at">low =</span> <span class="st">"green"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">mid =</span> <span class="st">"grey"</span>, <span class="at">midpoint =</span> <span class="fu">mean</span>(patients<span class="sc">$</span>Height))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/points_weight-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="motywy" class="level2">
+<h2 class="anchored" data-anchor-id="motywy">Motywy</h2>
+<ol type="1">
+<li>Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Dodaj do niego linie trendu bez przedziałów ufności dla każdej z grup wiekowych</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/themes_1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Usuń tytuł legendy. Zmień kolory tła pozycji legendy (key) na biało i umieść legendę pod wykresem.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a>  <span class="fu">theme</span>(</span>
+<span id="cb26-5"><a href="#cb26-5"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb26-6"><a href="#cb26-6"></a>    <span class="at">legend.key =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
+<span id="cb26-7"><a href="#cb26-7"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
+<span id="cb26-8"><a href="#cb26-8"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/themes_2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Dodaj odpowiedni tytuł do wykresu. Usuń pomniejsze linie siatki. Zapisz jako plik png o wymiarach 16 na 16 cm.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">theme</span>(</span>
+<span id="cb28-5"><a href="#cb28-5"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb28-6"><a href="#cb28-6"></a>    <span class="at">legend.key =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
+<span id="cb28-7"><a href="#cb28-7"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb28-8"><a href="#cb28-8"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb28-9"><a href="#cb28-9"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"BMI w stosunku do wagi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="lab8_files/figure-html/themes_3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="fu">ggsave</span>(<span class="st">"BMI_a_Waga.png"</span>, <span class="at">units =</span> <span class="st">"in"</span>, <span class="at">height =</span> <span class="dv">16</span>, <span class="at">width =</span> <span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+</div>
+<!-- -->
+
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb32" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb32-1"><a href="#cb32-1"></a><span class="co">---</span></span>
+<span id="cb32-2"><a href="#cb32-2"></a><span class="an">title:</span><span class="co"> "Zadanie 8. Wprowadzenie do ggplot2"</span></span>
+<span id="cb32-3"><a href="#cb32-3"></a><span class="an">author:</span><span class="co"> "Gabriel Szewczyk"</span></span>
+<span id="cb32-4"><a href="#cb32-4"></a><span class="an">date:</span><span class="co"> 12.05.2023</span></span>
+<span id="cb32-5"><a href="#cb32-5"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb32-6"><a href="#cb32-6"></a><span class="co">  html:</span></span>
+<span id="cb32-7"><a href="#cb32-7"></a><span class="co">    page-layout: full</span></span>
+<span id="cb32-8"><a href="#cb32-8"></a><span class="co">    code-fold: false</span></span>
+<span id="cb32-9"><a href="#cb32-9"></a><span class="co">    code-tools: true</span></span>
+<span id="cb32-10"><a href="#cb32-10"></a><span class="co">    code-line-numbers: true</span></span>
+<span id="cb32-11"><a href="#cb32-11"></a><span class="co">    fontsize: 18pt</span></span>
+<span id="cb32-12"><a href="#cb32-12"></a><span class="co">    df-print: kable</span></span>
+<span id="cb32-13"><a href="#cb32-13"></a><span class="an">editor:</span><span class="co"> visual</span></span>
+<span id="cb32-14"><a href="#cb32-14"></a><span class="co">---</span></span>
+<span id="cb32-15"><a href="#cb32-15"></a></span>
+<span id="cb32-16"><a href="#cb32-16"></a><span class="fu">## Załadowanie paczek i zbioru danych</span></span>
+<span id="cb32-17"><a href="#cb32-17"></a></span>
+<span id="cb32-18"><a href="#cb32-18"></a><span class="in">```{r load, warning=FALSE}</span></span>
+<span id="cb32-19"><a href="#cb32-19"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb32-20"><a href="#cb32-20"></a>patients <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"patient-data-cleaned.txt"</span>)</span>
+<span id="cb32-21"><a href="#cb32-21"></a>show_example <span class="ot">&lt;-</span> <span class="fu">head</span>(patients,<span class="dv">3</span>)</span>
+<span id="cb32-22"><a href="#cb32-22"></a>show_example</span>
+<span id="cb32-23"><a href="#cb32-23"></a><span class="in">```</span></span>
+<span id="cb32-24"><a href="#cb32-24"></a></span>
+<span id="cb32-25"><a href="#cb32-25"></a><span class="fu">## Wykresy punktowe (scatterplot)</span></span>
+<span id="cb32-26"><a href="#cb32-26"></a></span>
+<span id="cb32-27"><a href="#cb32-27"></a><span class="ss">1. </span>Narysuj wykres punktowy wagi pacjenta w funkcji BMI (w estetyce globalnej) i pokoloruj punkty w oparciu o wzrost (w estetyce lokalnej).</span>
+<span id="cb32-28"><a href="#cb32-28"></a></span>
+<span id="cb32-29"><a href="#cb32-29"></a><span class="in">```{r BMI}</span></span>
+<span id="cb32-30"><a href="#cb32-30"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-31"><a href="#cb32-31"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb32-32"><a href="#cb32-32"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-33"><a href="#cb32-33"></a>        <span class="fu">geom_point</span>()</span>
+<span id="cb32-34"><a href="#cb32-34"></a><span class="in">```</span></span>
+<span id="cb32-35"><a href="#cb32-35"></a></span>
+<span id="cb32-36"><a href="#cb32-36"></a><span class="ss">2. </span>Za pomocą dodatkowego geoma dopasuj gładką linię określającą trend.</span>
+<span id="cb32-37"><a href="#cb32-37"></a></span>
+<span id="cb32-38"><a href="#cb32-38"></a><span class="in">```{r trend, warning = FALSE}</span></span>
+<span id="cb32-39"><a href="#cb32-39"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-40"><a href="#cb32-40"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb32-41"><a href="#cb32-41"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-42"><a href="#cb32-42"></a>        <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-43"><a href="#cb32-43"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>)</span>
+<span id="cb32-44"><a href="#cb32-44"></a><span class="in">```</span></span>
+<span id="cb32-45"><a href="#cb32-45"></a></span>
+<span id="cb32-46"><a href="#cb32-46"></a><span class="ss">3. </span>Czy dopasowanie z poprzedniego wykresu wygląda dobrze? Spójrz na stronę pomocy dla geom_smooth i dostosuj metodę tak, aby pasowała do linii prostej i nie rysowała przedziału ufności.</span>
+<span id="cb32-47"><a href="#cb32-47"></a></span>
+<span id="cb32-48"><a href="#cb32-48"></a><span class="in">```{r smooth}</span></span>
+<span id="cb32-49"><a href="#cb32-49"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-50"><a href="#cb32-50"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI, <span class="at">color =</span> Height)</span>
+<span id="cb32-51"><a href="#cb32-51"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-52"><a href="#cb32-52"></a>        <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-53"><a href="#cb32-53"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'lm'</span>, <span class="at">se=</span><span class="cn">FALSE</span>)</span>
+<span id="cb32-54"><a href="#cb32-54"></a><span class="in">```</span></span>
+<span id="cb32-55"><a href="#cb32-55"></a></span>
+<span id="cb32-56"><a href="#cb32-56"></a><span class="fu">## Wykresy pudełkowe</span></span>
+<span id="cb32-57"><a href="#cb32-57"></a></span>
+<span id="cb32-58"><a href="#cb32-58"></a><span class="ss">1. </span>Wygeneruj wykres pudełkowy zmiennej Score porównując palaczy i niepalących</span>
+<span id="cb32-59"><a href="#cb32-59"></a></span>
+<span id="cb32-60"><a href="#cb32-60"></a><span class="in">```{r boxplot}</span></span>
+<span id="cb32-61"><a href="#cb32-61"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-62"><a href="#cb32-62"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> Score)</span>
+<span id="cb32-63"><a href="#cb32-63"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-64"><a href="#cb32-64"></a>        <span class="fu">geom_boxplot</span>()</span>
+<span id="cb32-65"><a href="#cb32-65"></a><span class="in">```</span></span>
+<span id="cb32-66"><a href="#cb32-66"></a></span>
+<span id="cb32-67"><a href="#cb32-67"></a><span class="ss">2. </span>Za pomocą kolorów rozdziel wykresy pudełkowe dodatkowo ze względu na płeć.</span>
+<span id="cb32-68"><a href="#cb32-68"></a></span>
+<span id="cb32-69"><a href="#cb32-69"></a><span class="in">```{r divide_boxes}</span></span>
+<span id="cb32-70"><a href="#cb32-70"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-71"><a href="#cb32-71"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> Score, <span class="at">fill=</span>Sex)</span>
+<span id="cb32-72"><a href="#cb32-72"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-73"><a href="#cb32-73"></a>        <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb32-74"><a href="#cb32-74"></a>        <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb32-75"><a href="#cb32-75"></a>        <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Wykres pudełkowy w oparciu o płeć'</span>)</span>
+<span id="cb32-76"><a href="#cb32-76"></a><span class="in">```</span></span>
+<span id="cb32-77"><a href="#cb32-77"></a></span>
+<span id="cb32-78"><a href="#cb32-78"></a><span class="fu">## Histogramy i estymatory jądrowe</span></span>
+<span id="cb32-79"><a href="#cb32-79"></a></span>
+<span id="cb32-80"><a href="#cb32-80"></a><span class="ss">1. </span>Wygeneruj histogram BMI kolorując każdy słupek na niebiesko. Dobierz odpowiednią szerokość przedziałów (binów). Swój wybór uzasadnij.</span>
+<span id="cb32-81"><a href="#cb32-81"></a></span>
+<span id="cb32-82"><a href="#cb32-82"></a><span class="in">```{r bar_chart, warning = FALSE}</span></span>
+<span id="cb32-83"><a href="#cb32-83"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-84"><a href="#cb32-84"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI)</span>
+<span id="cb32-85"><a href="#cb32-85"></a>        ) <span class="sc">+</span></span>
+<span id="cb32-86"><a href="#cb32-86"></a>        <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">binwidth =</span> <span class="dv">1</span>)</span>
+<span id="cb32-87"><a href="#cb32-87"></a><span class="in">```</span></span>
+<span id="cb32-88"><a href="#cb32-88"></a></span>
+<span id="cb32-89"><a href="#cb32-89"></a><span class="ss">2. </span>Zamiast histogramu wygeneruj wykres estymatora jądrowego.</span>
+<span id="cb32-90"><a href="#cb32-90"></a></span>
+<span id="cb32-91"><a href="#cb32-91"></a><span class="in">```{r kernel}</span></span>
+<span id="cb32-92"><a href="#cb32-92"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>BMI)) <span class="sc">+</span></span>
+<span id="cb32-93"><a href="#cb32-93"></a><span class="fu">geom_density</span>()</span>
+<span id="cb32-94"><a href="#cb32-94"></a><span class="in">```</span></span>
+<span id="cb32-95"><a href="#cb32-95"></a></span>
+<span id="cb32-96"><a href="#cb32-96"></a><span class="ss">3. </span>Porównaj histogram z estymatorem jądrowym na jednym wykresie. Ustaw przeźroczystość histogramu (alpha) na 20%. Dlaczego wysokości wykresów są różne? Ustaw estetykę globalną wykresu tak, aby ujednolicić pionową oś (wskazówka: użyj funkcji after_stat() z odpowiednim argumentem)</span>
+<span id="cb32-97"><a href="#cb32-97"></a></span>
+<span id="cb32-98"><a href="#cb32-98"></a><span class="in">```{r kernel_compare}</span></span>
+<span id="cb32-99"><a href="#cb32-99"></a><span class="co"># </span><span class="al">TODO</span></span>
+<span id="cb32-100"><a href="#cb32-100"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients,</span>
+<span id="cb32-101"><a href="#cb32-101"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI), after_stat) <span class="sc">+</span></span>
+<span id="cb32-102"><a href="#cb32-102"></a>        <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb32-103"><a href="#cb32-103"></a>        <span class="fu">geom_density</span>()       </span>
+<span id="cb32-104"><a href="#cb32-104"></a><span class="in">```</span></span>
+<span id="cb32-105"><a href="#cb32-105"></a></span>
+<span id="cb32-106"><a href="#cb32-106"></a>*Wartości wykresów są różne, ponieważ estymator jądrowy to funkcja gęstości prawdopodobieństwa której całka jest równa 1.*</span>
+<span id="cb32-107"><a href="#cb32-107"></a></span>
+<span id="cb32-108"><a href="#cb32-108"></a><span class="ss">4. </span>Wygeneruj wykresy estymatorów jądrowych BMI pokolorowane ze względu na płeć (kolor wypełnienia). Dobierz odpowiednią przeźroczystość.</span>
+<span id="cb32-109"><a href="#cb32-109"></a></span>
+<span id="cb32-110"><a href="#cb32-110"></a><span class="in">```{r kernel_charts}</span></span>
+<span id="cb32-111"><a href="#cb32-111"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">fill =</span> Sex)) <span class="sc">+</span></span>
+<span id="cb32-112"><a href="#cb32-112"></a><span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">fill=</span>Sex), <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb32-113"><a href="#cb32-113"></a><span class="in">```</span></span>
+<span id="cb32-114"><a href="#cb32-114"></a></span>
+<span id="cb32-115"><a href="#cb32-115"></a><span class="fu">## Kafelki</span></span>
+<span id="cb32-116"><a href="#cb32-116"></a></span>
+<span id="cb32-117"><a href="#cb32-117"></a><span class="ss">1. </span>Narysuj wykres punktowy wagi pacjenta w funkcji BMI i pokoloruj punkty w oparciu o wzrost. Podziel go na siatkę wykresów (kafelki) w oparciu o płeć i palenie papierosów.</span>
+<span id="cb32-118"><a href="#cb32-118"></a></span>
+<span id="cb32-119"><a href="#cb32-119"></a><span class="in">```{r weight_to_bmi}</span></span>
+<span id="cb32-120"><a href="#cb32-120"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">color =</span> Height)) <span class="sc">+</span></span>
+<span id="cb32-121"><a href="#cb32-121"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-122"><a href="#cb32-122"></a><span class="fu">facet_grid</span>(Sex <span class="sc">~</span> Smokes)</span>
+<span id="cb32-123"><a href="#cb32-123"></a><span class="in">```</span></span>
+<span id="cb32-124"><a href="#cb32-124"></a></span>
+<span id="cb32-125"><a href="#cb32-125"></a><span class="ss">2. </span>Wygeneruj wykres pudełkowy BMI porównując palących i niepalących, pokolorowanych ze względu na płeć i dodaj osobny kafelek ze względu na wiek.</span>
+<span id="cb32-126"><a href="#cb32-126"></a></span>
+<span id="cb32-127"><a href="#cb32-127"></a><span class="in">```{r box_chart_bmi}</span></span>
+<span id="cb32-128"><a href="#cb32-128"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Smokes, <span class="at">y =</span> BMI, <span class="at">fill =</span> Sex)) <span class="sc">+</span></span>
+<span id="cb32-129"><a href="#cb32-129"></a><span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb32-130"><a href="#cb32-130"></a><span class="fu">facet_wrap</span>(<span class="sc">~</span> Age)</span>
+<span id="cb32-131"><a href="#cb32-131"></a><span class="in">```</span></span>
+<span id="cb32-132"><a href="#cb32-132"></a></span>
+<span id="cb32-133"><a href="#cb32-133"></a><span class="ss">3. </span>Utwórz podobny boxplot BMI, ale tym razem pogrupuj dane ze względu na płeć, pokoloruj ze względu na wiek (wskazówka:przekształć kolor do zmiennej kategorycznej) a kafelki ze względu na to kto jest osobą palącą.</span>
+<span id="cb32-134"><a href="#cb32-134"></a></span>
+<span id="cb32-135"><a href="#cb32-135"></a><span class="in">```{r boxplot_bmi, warning = FALSE}</span></span>
+<span id="cb32-136"><a href="#cb32-136"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Sex, <span class="at">y =</span> BMI, <span class="at">fill =</span> Age)) <span class="sc">+</span></span>
+<span id="cb32-137"><a href="#cb32-137"></a><span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb32-138"><a href="#cb32-138"></a><span class="fu">facet_wrap</span>(<span class="sc">~</span> Smokes)</span>
+<span id="cb32-139"><a href="#cb32-139"></a><span class="in">```</span></span>
+<span id="cb32-140"><a href="#cb32-140"></a></span>
+<span id="cb32-141"><a href="#cb32-141"></a><span class="fu">## Skale</span></span>
+<span id="cb32-142"><a href="#cb32-142"></a></span>
+<span id="cb32-143"><a href="#cb32-143"></a><span class="ss">1. </span>Narysuj wykres punktowy wagi pacjenta w funkcji BMI.</span>
+<span id="cb32-144"><a href="#cb32-144"></a></span>
+<span id="cb32-145"><a href="#cb32-145"></a><span class="in">```{r point_weight_bmi}</span></span>
+<span id="cb32-146"><a href="#cb32-146"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> Weight, <span class="at">y =</span> BMI)) <span class="sc">+</span></span>
+<span id="cb32-147"><a href="#cb32-147"></a><span class="fu">geom_point</span>()</span>
+<span id="cb32-148"><a href="#cb32-148"></a><span class="in">```</span></span>
+<span id="cb32-149"><a href="#cb32-149"></a></span>
+<span id="cb32-150"><a href="#cb32-150"></a><span class="ss">2. </span>Zaczynając od poprzedniego wykresu dostosuj oś BMI tak aby zaznaczone byly tylko wartości 20, 30, 40 a na osi wagi wartości od 60 do 100 ze skokiem 5. Dodaj polską nazwę zmiennej i jednostkę (kg).</span>
+<span id="cb32-151"><a href="#cb32-151"></a></span>
+<span id="cb32-152"><a href="#cb32-152"></a><span class="in">```{r bmi_axis}</span></span>
+<span id="cb32-153"><a href="#cb32-153"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight)) <span class="sc">+</span></span>
+<span id="cb32-154"><a href="#cb32-154"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-155"><a href="#cb32-155"></a><span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>)) <span class="sc">+</span></span>
+<span id="cb32-156"><a href="#cb32-156"></a><span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
+<span id="cb32-157"><a href="#cb32-157"></a><span class="at">name =</span> <span class="st">"Weight [kg]"</span>)</span>
+<span id="cb32-158"><a href="#cb32-158"></a><span class="in">```</span></span>
+<span id="cb32-159"><a href="#cb32-159"></a></span>
+<span id="cb32-160"><a href="#cb32-160"></a><span class="ss">3. </span>Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Utwórz skalę kolorystyczną z punktem środkowym odpowiadającym średniemu wzrostowi pacjenta zaś ekstremami skali mają być zielony (minimum) i czerwony (maksimum) w odcieniach zgodnych z kolorami AGH. Jako środkowy kolor przyjąć szarość grey</span>
+<span id="cb32-161"><a href="#cb32-161"></a></span>
+<span id="cb32-162"><a href="#cb32-162"></a><span class="in">```{r points_weight}</span></span>
+<span id="cb32-163"><a href="#cb32-163"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Height, <span class="at">colour =</span> Height)) <span class="sc">+</span> </span>
+<span id="cb32-164"><a href="#cb32-164"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-165"><a href="#cb32-165"></a><span class="fu">scale_colour_gradient2</span>(<span class="at">low =</span> <span class="st">"green"</span>, <span class="at">high =</span> <span class="st">"red"</span>, <span class="at">mid =</span> <span class="st">"grey"</span>, <span class="at">midpoint =</span> <span class="fu">mean</span>(patients<span class="sc">$</span>Height))</span>
+<span id="cb32-166"><a href="#cb32-166"></a><span class="in">```</span></span>
+<span id="cb32-167"><a href="#cb32-167"></a></span>
+<span id="cb32-168"><a href="#cb32-168"></a><span class="fu">## Motywy</span></span>
+<span id="cb32-169"><a href="#cb32-169"></a></span>
+<span id="cb32-170"><a href="#cb32-170"></a><span class="ss">1. </span>Narysuj wykres punktowy wagi pacjenta w funkcji BMI. Pokoloruj go w skali kolorowej ze względu na wzrost. Dodaj do niego linie trendu bez przedziałów ufności dla każdej z grup wiekowych</span>
+<span id="cb32-171"><a href="#cb32-171"></a></span>
+<span id="cb32-172"><a href="#cb32-172"></a><span class="in">```{r themes_1, warning=FALSE}</span></span>
+<span id="cb32-173"><a href="#cb32-173"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb32-174"><a href="#cb32-174"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-175"><a href="#cb32-175"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-176"><a href="#cb32-176"></a><span class="in">```</span></span>
+<span id="cb32-177"><a href="#cb32-177"></a></span>
+<span id="cb32-178"><a href="#cb32-178"></a><span class="ss">2. </span>Usuń tytuł legendy. Zmień kolory tła pozycji legendy (key) na biało i umieść legendę pod wykresem.</span>
+<span id="cb32-179"><a href="#cb32-179"></a></span>
+<span id="cb32-180"><a href="#cb32-180"></a><span class="in">```{r themes_2, warning=FALSE}</span></span>
+<span id="cb32-181"><a href="#cb32-181"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb32-182"><a href="#cb32-182"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-183"><a href="#cb32-183"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb32-184"><a href="#cb32-184"></a>  <span class="fu">theme</span>(</span>
+<span id="cb32-185"><a href="#cb32-185"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb32-186"><a href="#cb32-186"></a>    <span class="at">legend.key =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
+<span id="cb32-187"><a href="#cb32-187"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
+<span id="cb32-188"><a href="#cb32-188"></a>  )</span>
+<span id="cb32-189"><a href="#cb32-189"></a><span class="in">```</span></span>
+<span id="cb32-190"><a href="#cb32-190"></a></span>
+<span id="cb32-191"><a href="#cb32-191"></a><span class="ss">3. </span>Dodaj odpowiedni tytuł do wykresu. Usuń pomniejsze linie siatki. Zapisz jako plik png o wymiarach 16 na 16 cm.</span>
+<span id="cb32-192"><a href="#cb32-192"></a></span>
+<span id="cb32-193"><a href="#cb32-193"></a><span class="in">```{r themes_3, warning=FALSE}</span></span>
+<span id="cb32-194"><a href="#cb32-194"></a><span class="fu">ggplot</span>(<span class="at">data =</span> patients, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> BMI, <span class="at">y =</span> Weight, <span class="at">colour =</span> Age)) <span class="sc">+</span></span>
+<span id="cb32-195"><a href="#cb32-195"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-196"><a href="#cb32-196"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb32-197"><a href="#cb32-197"></a>  <span class="fu">theme</span>(</span>
+<span id="cb32-198"><a href="#cb32-198"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb32-199"><a href="#cb32-199"></a>    <span class="at">legend.key =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),</span>
+<span id="cb32-200"><a href="#cb32-200"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb32-201"><a href="#cb32-201"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb32-202"><a href="#cb32-202"></a>  ) <span class="sc">+</span></span>
+<span id="cb32-203"><a href="#cb32-203"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"BMI w stosunku do wagi"</span>)</span>
+<span id="cb32-204"><a href="#cb32-204"></a><span class="fu">ggsave</span>(<span class="st">"BMI_a_Waga.png"</span>, <span class="at">units =</span> <span class="st">"in"</span>, <span class="at">height =</span> <span class="dv">16</span>, <span class="at">width =</span> <span class="dv">16</span>)</span>
+<span id="cb32-205"><a href="#cb32-205"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>
