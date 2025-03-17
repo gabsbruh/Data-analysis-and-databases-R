@@ -1,8 +1,10 @@
 # Data-analysis-and-databases
-This repository contains all my solutions of tasks given on the course Data Analysis and Databases. After M prefix, 
+This repository contains all my solutions of tasks given on the course Data Analysis and Databases. After M prefix, there is also solutions to Data Analytics course.
 
 [syllabus of the course Data analysis and databases](https://github.com/gabsbruh/Data-analysis-and-databases/blob/main/data-analysis-and-databases-syllabus.pdf)
+
 [syllabus of the course Data analytics](https://github.com/gabsbruh/Data-analysis-and-databases/blob/main/data-analytics-syllabus.pdf)
+
 **List of lab topics:**
   * [Introduction to R](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/01.%20Introduction%20to%20R)
   * [Quarto basics](https://github.com/gabsbruh/Data-analysis-and-databases/tree/main/02.%20Quarto%20basics)
